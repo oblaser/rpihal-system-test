@@ -16,8 +16,22 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #define LOG_LEVEL_INF (3)
 #define LOG_LEVEL_DBG (4)
 
+
+
+// stringify
+#define ___LOG_STR_HELPER(x) #x
+#define ___LOG_STR(x)        ___LOG_STR_HELPER(x)
+
+
+
 #ifndef CONFIG_LOG_LEVEL
+#ifdef _MSC_VER
+#define __PRAGMA_LOC__ __FILE__ "(" ___LOG_STR(__LINE__) ") "
+__pragma(message(__PRAGMA_LOC__ ": warning: \"CONFIG_LOG_LEVEL is not defined, defaulting to 2 (warning)\""))
+#undef __PRAGMA_LOC__
+#else //_MSC_VER
 #warning "CONFIG_LOG_LEVEL is not defined, defaulting to 2 (warning)"
+#endif //_MSC_VER
 #define CONFIG_LOG_LEVEL LOG_LEVEL_WRN
 #endif
 
@@ -53,10 +67,6 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 
 // optional args
 #define ___LOG_OPT_VA_ARGS(...) , ##__VA_ARGS__
-
-// stringify
-#define ___LOG_STR_HELPER(x) #x
-#define ___LOG_STR(x)        ___LOG_STR_HELPER(x)
 
 #define ___LOG_CSI_EL "\033[2K" // ANSI ESC CSI erase line
 
