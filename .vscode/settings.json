@@ -1,0 +1,12 @@
+{
+    "[c][cpp]": {
+        "editor.defaultFormatter": "xaver.clang-format",
+        "editor.formatOnSave": true,
+    },
+
+    "files.associations": {
+        "*.pjob": "shellscript",
+        "potorooJob*": "shellscript",
+        "cstdint": "cpp"
+    }
+}

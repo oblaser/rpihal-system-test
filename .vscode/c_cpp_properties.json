@@ -1,0 +1,26 @@
+{
+    "configurations": [
+        {
+            "name": "IntelliSense helper",
+            "includePath": [
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/sdk/omw/include",
+                "${workspaceFolder}/sdk/rpihal/include",
+                "${sdk}/OpenWRT-19.07.3/toolchain-mipsel_24kc_gcc-7.5.0_musl/include" // just any Linux include directory to help VSCode IntelliSense
+            ],
+            "defines": [
+                "__unix__",
+                "__linux__",
+                "__arm__",
+                "_GNU_SOURCE",
+                //"RPIHAL_EMU",
+                "RPIHAL_CONFIG_LOG_LEVEL=4",
+                "CONFIG_LOG_LEVEL=4",
+                "_DEBUG"
+            ],
+            "compilerPath": "C:/programsAdmin/ST/STM32CubeCLT_1.15.1/GNU-tools-for-STM32/bin/arm-none-eabi-gcc-12.3.1.exe", // just any arm g++.exe, so that VSCode does not default to cl.exe
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
