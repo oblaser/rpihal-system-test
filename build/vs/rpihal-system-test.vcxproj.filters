@@ -27,6 +27,9 @@
     <ClCompile Include="..\..\sdk\rpihal\src\emu\emu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\sdk\rpihal\src\internal\gpio.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\project.h">
