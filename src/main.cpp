@@ -10,6 +10,9 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #include "middleware/util.h"
 #include "project.h"
 
+#include <omw/cli.h>
+#include <omw/defs.h>
+#include <omw/windows/windows.h>
 #include <rpihal/rpihal.h>
 
 #define LOG_MODULE_LEVEL LOG_LEVEL_DBG
@@ -41,10 +44,15 @@ static_assert(EC__end_ <= EC__max_, "too many error codes defined");
 
 int main(int argc, char** argv)
 {
+#ifdef OMW_PLAT_WIN
+    const auto winOutCodePage = omw::windows::consoleGetOutCodePage();
+    bool winOutCodePageRes = omw::windows::consoleSetOutCodePage(omw::windows::UTF8CP);
+    omw::ansiesc::enable(omw::windows::consoleEnVirtualTermProc());
+#endif // OMW_PLAT_WIN
+
     int r = EC_OK;
     int err;
 
-    RPIHAL___setModel___(RPIHAL_model_3B); // temporary hack!       TODO update rpihal
 #ifdef RPIHAL_EMU
     if (RPIHAL_EMU_init(RPIHAL_model_3B) == 0)
     {
@@ -59,6 +67,20 @@ int main(int argc, char** argv)
     RPIHAL_GPIO_dumpAltFuncReg(0x3c0000);
     RPIHAL_GPIO_dumpPullUpDnReg(0x3c0000);
 #endif
+
+
+
+    // TODO move to rpihal module system test
+    {
+        const char* compatible = RPIHAL_dt_compatible();
+        const char* model = RPIHAL_dt_model();
+
+        if (!compatible) { compatible = "?"; }
+        if (!model) { model = "?"; }
+
+        LOG_INF("device tree compatible: %s", compatible);
+        LOG_INF("device tree model:      %s", model);
+    }
 
 
 
@@ -83,6 +105,10 @@ int main(int argc, char** argv)
     }
 
     gpio::reset();
+
+#ifdef OMW_PLAT_WIN
+    winOutCodePageRes = omw::windows::consoleSetOutCodePage(winOutCodePage);
+#endif
 
     return r;
 }
