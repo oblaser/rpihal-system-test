@@ -70,21 +70,32 @@ int main(int argc, char** argv)
 
 
 
-    // TODO move to rpihal module system test
+    if (r == EC_OK)
     {
-        const char* compatible = RPIHAL_dt_compatible();
-        const char* model = RPIHAL_dt_model();
+        // TODO move to rpihal module system test
+        {
+            const char* dtCompatible = RPIHAL_dt_compatible();
+            const char* dtModel = RPIHAL_dt_model();
 
-        if (!compatible) { compatible = "?"; }
-        if (!model) { model = "?"; }
+            if (!dtCompatible) { dtCompatible = "?"; }
+            if (!dtModel) { dtModel = "?"; }
 
-        LOG_INF("device tree compatible: %s", compatible);
-        LOG_INF("device tree model:      %s", model);
+            LOG_INF("device tree compatible: %s", dtCompatible);
+            LOG_INF("device tree model:      %s", dtModel);
+
+            const RPIHAL_model_t model = RPIHAL_getModel();
+
+            LOG_INF("rpihal detected model:  %llu 0x%016llx", (uint64_t)model, (uint64_t)model);
+        }
     }
 
 
 
-    while (r == EC_OK)
+    while ((r == EC_OK)
+#ifdef RPIHAL_EMU                    //
+           && RPIHAL_EMU_isRunning() // this is optional, but may be convenient when EMU is used a lot
+#endif                               //
+    )
     {
         gpio::task();
 
@@ -105,6 +116,10 @@ int main(int argc, char** argv)
     }
 
     gpio::reset();
+
+#ifdef RPIHAL_EMU
+    RPIHAL_EMU_cleanup();
+#endif // RPIHAL_EMU
 
 #ifdef OMW_PLAT_WIN
     winOutCodePageRes = omw::windows::consoleSetOutCodePage(winOutCodePage);
