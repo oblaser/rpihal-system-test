@@ -85,7 +85,7 @@ int main(int argc, char** argv)
 
             const RPIHAL_model_t model = RPIHAL_getModel();
 
-            LOG_INF("rpihal detected model:  %llu 0x%016llx", (uint64_t)model, (uint64_t)model);
+            LOG_INF("rpihal detected model:  %lli 0x%016llx", (long long)model, (long long)model);
         }
     }
 
