@@ -79,3 +79,58 @@ int util::sleep(unsigned t_ms)
     return usleep(t_ms * 1000);
 #endif // OMW_PLAT_WIN
 }
+
+
+
+//======================================================================================================================
+// system test
+
+
+
+namespace system_test {
+
+void TestCaseCounter::add(size_t total, size_t ok)
+{
+    m_total += total;
+    m_ok += ok;
+}
+
+void TestCaseCounter::add(const TestCaseCounter& counter)
+{
+    m_total += counter.total();
+    m_ok += counter.ok();
+}
+
+} // namespace system_test
+
+
+
+// system test
+//======================================================================================================================
+// omw_
+
+
+
+#include <iostream>
+#include <string>
+omw_::cli::ChoiceAnswer omw_::cli::choice(const std::string& question, const ChoiceAnswer& defaultOption, char optionA, char optionB)
+{
+    ChoiceAnswer r = ChoiceAnswer::none;
+    const omw::string a(1, optionA);
+    const omw::string b(1, optionB);
+    omw::string data;
+
+    do {
+        std::cout << question << " [" << (defaultOption == ChoiceAnswer::A ? a.toUpper_ascii() : a) << "/"
+                  << (defaultOption == ChoiceAnswer::B ? b.toUpper_ascii() : b) << "] ";
+        std::getline(std::cin, data);
+
+        if (data.toLower_ascii() == a) { r = ChoiceAnswer::A; }
+        else if (data.toLower_ascii() == b) { r = ChoiceAnswer::B; }
+        else if (data.length() == 0) { r = defaultOption; }
+        else { r = ChoiceAnswer::none; }
+    }
+    while ((r != ChoiceAnswer::A) && (r != ChoiceAnswer::B));
+
+    return r;
+}

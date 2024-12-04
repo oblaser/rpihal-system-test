@@ -9,6 +9,7 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #include "middleware/gpio.h"
 #include "middleware/util.h"
 #include "project.h"
+#include "system-test/rpihal.h"
 
 #include <omw/cli.h>
 #include <omw/defs.h>
@@ -60,6 +61,30 @@ int main(int argc, char** argv)
     }
 #endif // RPIHAL_EMU
 
+
+
+    //==================================================================================================================
+    // system test cases
+
+    if (r == EC_OK)
+    {
+        system_test::Context ctx;
+
+        system_test::rpihal(ctx);
+
+        printf("\n");
+        printf("test cases: %llu/%llu\n", (long long unsigned)ctx.counter().ok(), (long long unsigned)ctx.counter().total());
+        printf("\n");
+        printf("========================================================================\n");
+        printf("\n");
+    }
+
+    // system test cases
+    //==================================================================================================================
+    // normal application
+
+
+
     err = gpio::init();
     if (err) { r = EC_RPIHAL_INIT_ERROR; }
 
@@ -67,29 +92,6 @@ int main(int argc, char** argv)
     RPIHAL_GPIO_dumpAltFuncReg(0x3c0000);
     RPIHAL_GPIO_dumpPullUpDnReg(0x3c0000);
 #endif
-
-
-
-    if (r == EC_OK)
-    {
-        // TODO move to rpihal module system test
-        {
-            const char* dtCompatible = RPIHAL_dt_compatible();
-            const char* dtModel = RPIHAL_dt_model();
-
-            if (!dtCompatible) { dtCompatible = "?"; }
-            if (!dtModel) { dtModel = "?"; }
-
-            LOG_INF("device tree compatible: %s", dtCompatible);
-            LOG_INF("device tree model:      %s", dtModel);
-
-            const RPIHAL_model_t model = RPIHAL_getModel();
-
-            LOG_INF("rpihal detected model:  %lli 0x%016llx", (long long)model, (long long)model);
-        }
-    }
-
-
 
     while ((r == EC_OK)
 #ifdef RPIHAL_EMU                    //
