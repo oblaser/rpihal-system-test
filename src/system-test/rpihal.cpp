@@ -111,12 +111,29 @@ system_test::TestCaseCounter Model_Detection()
             modelStr = "CM4";
             break;
 
+        case RPIHAL_model_cm4s:
+            modelStr = "CM4S";
+            break;
+
         case RPIHAL_model_bcm2712:
             modelStr = "BCM2712";
             break;
 
+        case RPIHAL_model_5:
+            modelStr = "5";
+            break;
+
+        case RPIHAL_model_500:
+            modelStr = "500";
+            break;
+
+        case RPIHAL_model_cm5:
+            modelStr = "CM5";
+            break;
+
         default:
-            printf("\033[91mERR\033[39m model 0x%08llx is unknown in system-test (%s:%i)\n", (long long)model, __PRETTY_FUNCTION__, (int)(__LINE__));
+            printf("\033[91mERR\033[39m model 0x%08llx is unknown to the system-test application (%s:%i)\n", (long long)model, __PRETTY_FUNCTION__,
+                   (int)(__LINE__));
             modelStr = "ERROR";
             break;
         }
