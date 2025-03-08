@@ -10,6 +10,7 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 
 #include <rpihal/gpio.h>
 
+
 #define LOG_MODULE_LEVEL LOG_LEVEL_DBG
 #define LOG_MODULE_NAME  GPIO
 #include "middleware/log.h"

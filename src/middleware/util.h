@@ -89,7 +89,7 @@ private:
 #include <omw/omw.h>
 namespace omw_ {
 
-#if OMW_VERSION_ID <= OMW_VERSION_ID_0_2_1_BETA
+#if OMW_VERSION_ID <= (250201)
 namespace cli {
 
     enum class ChoiceAnswer
@@ -101,7 +101,7 @@ namespace cli {
     };
 
     ChoiceAnswer choice(const std::string& question, const ChoiceAnswer& defaultOption = ChoiceAnswer::none, char optionA = 'y', char optionB = 'n');
-    ChoiceAnswer choice(const std::string& question, const ChoiceAnswer& defaultOption, char optionA, char optionB, char option);
+    ChoiceAnswer choice(const std::string& question, const ChoiceAnswer& defaultOption, char optionA, char optionB, char optionC);
 }
 #endif
 

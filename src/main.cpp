@@ -16,9 +16,18 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #include <omw/windows/windows.h>
 #include <rpihal/rpihal.h>
 
+
 #define LOG_MODULE_LEVEL LOG_LEVEL_DBG
 #define LOG_MODULE_NAME  MAIN
 #include "middleware/log.h"
+
+
+#define ARG_FLAG_TEST (0x00000001)
+#define ARG_FLAG_GPIO (0x00000002)
+#define ARG_FLAG_SPI  (0x00000004)
+#define ARG_FLAG_I2C  (0x00000008)
+#define ARG_FLAG_ALL  (ARG_FLAG_GPIO | ARG_FLAG_SPI | ARG_FLAG_I2C)
+#define ARG_FLAG_APP  (0x00000010)
 
 
 namespace {
@@ -43,8 +52,31 @@ static_assert(EC__end_ <= EC__max_, "too many error codes defined");
 }
 
 
+
+static uint32_t parseArgs(int argc, char** argv);
+
+
+
 int main(int argc, char** argv)
 {
+#if PRJ_DEBUG && 1
+
+    // clang-format off
+    char* ___dbg_argv[] = {
+        argv[0],
+
+        "test",
+        "all",
+
+        //"app",
+    };
+    // clang-format on
+
+    argc = SIZEOF_ARRAY(___dbg_argv);
+    argv = ___dbg_argv;
+
+#endif
+
 #ifdef OMW_PLAT_WIN
     const auto winOutCodePage = omw::windows::consoleGetOutCodePage();
     bool winOutCodePageRes = omw::windows::consoleSetOutCodePage(omw::windows::UTF8CP);
@@ -52,7 +84,9 @@ int main(int argc, char** argv)
 #endif // OMW_PLAT_WIN
 
     int r = EC_OK;
-    int err;
+
+    const uint32_t argFlags = parseArgs(argc, argv);
+
 
 #ifdef RPIHAL_EMU
     if (RPIHAL_EMU_init(RPIHAL_model_3B) == 0)
@@ -63,14 +97,22 @@ int main(int argc, char** argv)
 
 
 
+    if ((r == EC_OK) && (argFlags == 0)) { LOG_ERR("TODO print device tree info"); }
+
+
+
     //==================================================================================================================
     // system test cases
 
-    if (r == EC_OK)
+    if ((r == EC_OK) && (argFlags & ARG_FLAG_TEST))
     {
         system_test::Context ctx;
 
         system_test::rpihal(ctx);
+
+        // if (argFlags & ARG_FLAG_GPIO) { system_test::gpio(ctx); }
+        // if (argFlags & ARG_FLAG_SPI) { system_test::spi(ctx); }
+        // ...
 
         printf("\n");
         printf("test cases: %llu/%llu\n", (long long unsigned)ctx.counter().ok(), (long long unsigned)ctx.counter().total());
@@ -85,39 +127,42 @@ int main(int argc, char** argv)
 
 
 
-    err = gpio::init();
-    if (err) { r = EC_RPIHAL_INIT_ERROR; }
+    if ((r == EC_OK) && (argFlags & ARG_FLAG_APP))
+    {
+        const int err = gpio::init();
+        if (err) { r = EC_RPIHAL_INIT_ERROR; }
 
 #if defined(PRJ_DEBUG) && 0
-    RPIHAL_GPIO_dumpAltFuncReg(0x3c0000);
-    RPIHAL_GPIO_dumpPullUpDnReg(0x3c0000);
+        RPIHAL_GPIO_dumpAltFuncReg(0x3c0000);
+        RPIHAL_GPIO_dumpPullUpDnReg(0x3c0000);
 #endif
 
-    while ((r == EC_OK)
-#ifdef RPIHAL_EMU                    //
-           && RPIHAL_EMU_isRunning() // this is optional, but may be convenient when EMU is used a lot
-#endif                               //
-    )
-    {
-        gpio::task();
-
-        if (gpio::btn0->pos()) { LOG_INF("BTN0 pos"); }
-        if (gpio::btn0->neg()) { LOG_INF("BTN0 neg"); }
-
-        if (gpio::btn1->pos())
+        while ((r == EC_OK)
+#ifdef RPIHAL_EMU                        //
+               && RPIHAL_EMU_isRunning() // this is optional, but may be convenient when EMU is used a lot
+#endif                                   //
+        )
         {
-            LOG_INF("BTN1 pos");
-            gpio::led1->toggle();
+            gpio::task();
+
+            if (gpio::btn0->pos()) { LOG_INF("BTN0 pos"); }
+            if (gpio::btn0->neg()) { LOG_INF("BTN0 neg"); }
+
+            if (gpio::btn1->pos())
+            {
+                LOG_INF("BTN1 pos");
+                gpio::led1->toggle();
+            }
+
+            if (gpio::btn1->neg()) { LOG_INF("BTN1 neg"); }
+
+            gpio::led0->write(gpio::btn0->state());
+
+            util::sleep(5);
         }
 
-        if (gpio::btn1->neg()) { LOG_INF("BTN1 neg"); }
-
-        gpio::led0->write(gpio::btn0->state());
-
-        util::sleep(5);
+        gpio::reset();
     }
-
-    gpio::reset();
 
 #ifdef RPIHAL_EMU
     RPIHAL_EMU_cleanup();
@@ -128,4 +173,26 @@ int main(int argc, char** argv)
 #endif
 
     return r;
+}
+
+
+
+uint32_t parseArgs(int argc, char** argv)
+{
+    uint32_t flags = 0;
+
+    for (int i = 1; i < argc; ++i)
+    {
+        const std::string arg = *(argv + i);
+
+        if (arg == "test") { flags |= ARG_FLAG_TEST; }
+        else if (arg == "gpio") { flags |= ARG_FLAG_GPIO; }
+        else if (arg == "spi") { flags |= ARG_FLAG_SPI; }
+        else if (arg == "i2c") { flags |= ARG_FLAG_I2C; }
+        else if (arg == "all") { flags |= ARG_FLAG_ALL; }
+        else if (arg == "app") { flags |= ARG_FLAG_APP; }
+        else { LOG_WRN("ignoring unknown option: %s", arg.c_str()); }
+    }
+
+    return flags;
 }
