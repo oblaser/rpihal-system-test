@@ -9,6 +9,7 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #include "middleware/gpio.h"
 #include "middleware/util.h"
 #include "project.h"
+#include "system-test/context.h"
 #include "system-test/rpihal.h"
 
 #include <omw/cli.h>
@@ -41,7 +42,7 @@ enum EXITCODE // https://tldp.org/LDP/abs/html/exitcodes.html / on MSW are no pr
 
     EC_RPIHAL_INIT_ERROR = EC__begin_,
     EC_USER_ABORT,
-    // EC_..,
+    EC_MODEL_DETECT_FAILED,
 
     EC__end_,
 
@@ -60,21 +61,28 @@ static uint32_t parseArgs(int argc, char** argv);
 int main(int argc, char** argv)
 {
 #if PRJ_DEBUG && 1
+    {
+        static char __attribute__((unused)) arg_test[] = "test";
+        static char __attribute__((unused)) arg_gpio[] = "gpio";
+        static char __attribute__((unused)) arg_spi[] = "spi";
+        static char __attribute__((unused)) arg_i2c[] = "i2c";
+        static char __attribute__((unused)) arg_all[] = "all";
+        static char __attribute__((unused)) arg_app[] = "app";
 
-    // clang-format off
-    char* ___dbg_argv[] = {
-        argv[0],
+        // clang-format off
+        static char* ___dbg_argv[] = {
+            argv[0],
 
-        "test",
-        "all",
+            arg_test,
+            arg_all,
 
-        //"app",
-    };
-    // clang-format on
+            //arg_app,
+        };
+        // clang-format on
 
-    argc = SIZEOF_ARRAY(___dbg_argv);
-    argv = ___dbg_argv;
-
+        argc = SIZEOF_ARRAY(___dbg_argv);
+        argv = ___dbg_argv;
+    }
 #endif
 
 #ifdef OMW_PLAT_WIN
@@ -97,7 +105,7 @@ int main(int argc, char** argv)
 
 
 
-    if ((r == EC_OK) && (argFlags == 0)) { LOG_ERR("TODO print device tree info"); }
+    if ((r == EC_OK) && !(argFlags & ARG_FLAG_TEST)) { system_test::util::printModelDetectionInfo(); }
 
 
 
@@ -108,11 +116,13 @@ int main(int argc, char** argv)
     {
         system_test::Context ctx;
 
-        system_test::rpihal(ctx);
+        const int modelDetectErr = system_test::rpihal(ctx);
 
-        // if (argFlags & ARG_FLAG_GPIO) { system_test::gpio(ctx); }
-        // if (argFlags & ARG_FLAG_SPI) { system_test::spi(ctx); }
-        // ...
+        if (modelDetectErr != 0) { r = EC_MODEL_DETECT_FAILED; }
+
+        // if ((argFlags & ARG_FLAG_GPIO) && (modelDetectErr == 0)) { system_test::gpio(ctx); }
+        // if ((argFlags & ARG_FLAG_SPI) && (modelDetectErr == 0)) { system_test::spi(ctx); }
+        //  ...
 
         printf("\n");
         printf("test cases: %llu/%llu\n", (long long unsigned)ctx.counter().ok(), (long long unsigned)ctx.counter().total());
@@ -123,9 +133,7 @@ int main(int argc, char** argv)
 
     // system test cases
     //==================================================================================================================
-    // normal application
-
-
+    // demo application
 
     if ((r == EC_OK) && (argFlags & ARG_FLAG_APP))
     {
@@ -163,6 +171,11 @@ int main(int argc, char** argv)
 
         gpio::reset();
     }
+
+    // demo application
+    //==================================================================================================================
+
+
 
 #ifdef RPIHAL_EMU
     RPIHAL_EMU_cleanup();

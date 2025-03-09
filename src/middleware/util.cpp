@@ -83,30 +83,6 @@ int util::sleep(unsigned t_ms)
 
 
 //======================================================================================================================
-// system test
-
-
-
-namespace system_test {
-
-void TestCaseCounter::add(size_t total, size_t ok)
-{
-    m_total += total;
-    m_ok += ok;
-}
-
-void TestCaseCounter::add(const TestCaseCounter& counter)
-{
-    m_total += counter.total();
-    m_ok += counter.ok();
-}
-
-} // namespace system_test
-
-
-
-// system test
-//======================================================================================================================
 // omw_
 
 

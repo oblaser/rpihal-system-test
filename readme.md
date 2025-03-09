@@ -10,9 +10,10 @@ It is also an example/template for projects using rpihal.
 ### Build
 ```sh
 cd build
-./build.sh cmake make
+./build.sh cmake make [run]
 ```
 > Do not build the debug version (`cmaked`), it may have some options enabled by default.
+If the application is run directly (optional), it's run with [no options](#run).
 
 ### Run
 ```sh
@@ -29,7 +30,7 @@ If the binary is run without any options, only the detected model is printed, no
 | `spi`  | needs a MCP3004 and a shift register as in the [test hardware](#hardware) |
 | `i2c`  | needs a TMP1075DR as in the [test hardware](#hardware) |
 | `all`  | `gpio`, `spi` and `i2c` |
-| `app`  | Run the demo application after the tests have succeeded. |
+| `app`  | run the demo application after the tests have succeeded |
 
 
 ## Hardware

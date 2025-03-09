@@ -1,22 +1,40 @@
 /*
 author          Oliver Blaser
-copyright       MIT - Copyright (c) 2024 Oliver Blaser
+copyright       MIT - Copyright (c) 2025 Oliver Blaser
 */
 
-#ifndef IG_SYSTEM_TEST_RPIHAL_H
-#define IG_SYSTEM_TEST_RPIHAL_H
+#ifndef IG_SYSTEMTEST_RPIHAL_H
+#define IG_SYSTEMTEST_RPIHAL_H
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 
-#include "middleware/util.h"
+#include "system-test/context.h"
 
 
 namespace system_test {
 
-void rpihal(system_test::Context& ctx);
+/**
+ * @brief Runs the system tests for the RPIHAL module.
+ *
+ * @param [in,out] ctx System test context
+ * @return Status of the model detection
+ * @retval 0 if the detected model is confirmed by the user
+ * @retval -1 if the detected model is denied by the user
+ */
+int rpihal(system_test::Context& ctx);
 
-}
 
 
-#endif // IG_SYSTEM_TEST_RPIHAL_H
+namespace util {
+
+    std::string model_to_string(uint64_t model);
+    void printModelDetectionInfo();
+
+} // namespace util
+
+} // namespace system_test
+
+
+#endif // IG_SYSTEMTEST_RPIHAL_H

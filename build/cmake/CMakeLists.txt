@@ -58,6 +58,7 @@ include_directories(../../src/)
 set(SOURCES
 ../../src/middleware/gpio.cpp
 ../../src/middleware/util.cpp
+../../src/system-test/context.cpp
 ../../src/system-test/rpihal.cpp
 ../../src/main.cpp
 )
