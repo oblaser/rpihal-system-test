@@ -60,6 +60,7 @@ set(SOURCES
 ../../src/middleware/util.cpp
 ../../src/system-test/cli.cpp
 ../../src/system-test/context.cpp
+../../src/system-test/gpio.cpp
 ../../src/system-test/rpihal.cpp
 ../../src/main.cpp
 )

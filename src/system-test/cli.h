@@ -57,7 +57,12 @@ namespace cli {
 
     void printModuleTitle(const std::string& moduleName__func__);
     void printTestCaseTitle(const std::string& caseName__func__);
+    void printUnassocTitle(const std::string& name);
+
     void printResult(const system_test::Context& ctx);
+
+    void printError(system_test::TestObejct& to, const std::string& text);
+    void printWarning(system_test::TestObejct& to, const std::string& text);
 
     /**
      * Prints the instruction and waits until the user pressed enter.
@@ -69,12 +74,12 @@ namespace cli {
     /**
      * Prints the yes/no question and waits until the user answered. Updates total and OK counters accordingly.
      *
-     * @param [in,out] tco Current test module or case
+     * @param [in,out] to Current test module or case
      * @param text The question text
      * @retval true If the user answered `y`
      * @retval false If the user answered `n`
      */
-    bool check(system_test::TestObejct& tco, const std::string& text);
+    bool check(system_test::TestObejct& to, const std::string& text);
 
 } // namespace cli
 } // namespace system_test

@@ -11,6 +11,7 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #include "project.h"
 #include "system-test/cli.h"
 #include "system-test/context.h"
+#include "system-test/gpio.h"
 #include "system-test/rpihal.h"
 
 #include <omw/cli.h>
@@ -122,9 +123,21 @@ int main(int argc, char** argv)
 
         if (modelDetectErr != 0) { r = EC_MODEL_DETECT_FAILED; }
 
-        // if ((argFlags & ARG_FLAG_GPIO) && !modelDetectErr) { ctx.add(system_test::gpio()); }
-        // if ((argFlags & ARG_FLAG_SPI) && !modelDetectErr) { ctx.add(system_test::spi()); }
-        //  ...
+
+
+        if ((r == EC_OK) && (argFlags & (ARG_FLAG_GPIO | ARG_FLAG_SPI)))
+        {
+            const auto tmp = system_test::GPIO_init();
+            ctx.add(tmp);
+
+            if (!tmp.allOk()) { r = EC_RPIHAL_INIT_ERROR; }
+        }
+
+
+
+        if ((r == EC_OK) && (argFlags & ARG_FLAG_GPIO)) { ctx.add(system_test::GPIO()); }
+        // if ((r == EC_OK) && (argFlags & ARG_FLAG_SPI)) { ctx.add(system_test::spi()); }
+        // ...
 
         system_test::cli::printResult(ctx);
     }

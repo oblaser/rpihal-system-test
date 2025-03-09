@@ -35,6 +35,8 @@ public:
     size_t total() const { return m_total; }
     size_t ok() const { return m_ok; }
 
+    const bool allOk() const { return (m_total == m_ok); }
+
 private:
     size_t m_total;
     size_t m_ok;
@@ -45,16 +47,22 @@ private:
 class TestObejct
 {
 public:
-    TestObejct()
-        : m_counter()
-    {}
+    explicit TestObejct(const std::string& name);
 
     virtual ~TestObejct() {}
 
     TestCaseCounter& counter() { return m_counter; }
     const TestCaseCounter& counter() const { return m_counter; }
 
+    void assert(bool value) { m_counter.add(1, (value ? 1 : 0)); }
+
+    const bool allOk() const { return m_counter.allOk(); }
+
 protected:
+    TestObejct()
+        : m_counter()
+    {}
+
     TestCaseCounter m_counter;
 };
 
@@ -95,11 +103,11 @@ public:
 
     virtual ~Context() {}
 
-    void add(const Module& module) { m_counter.add(module.counter()); }
+    void add(const TestObejct& to) { m_counter.add(to.counter()); }
 
     const TestCaseCounter& counter() const { return m_counter; }
 
-    const bool allOk() const { return (m_counter.total() == m_counter.ok()); }
+    const bool allOk() const { return m_counter.allOk(); }
 
 private:
     TestCaseCounter m_counter;

@@ -25,6 +25,12 @@ void TestCaseCounter::add(const TestCaseCounter& counter)
     m_ok += counter.ok();
 }
 
+TestObejct::TestObejct(const std::string& name)
+    : m_counter()
+{
+    cli::printUnassocTitle(name);
+}
+
 Case::Case(const std::string& caseName__func__)
     : TestObejct()
 {

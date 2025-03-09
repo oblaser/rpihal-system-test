@@ -6,6 +6,7 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include <cstddef>
 #include <cstdint>
 #include <cstdio>
+#include <iomanip>
 #include <iostream>
 #include <string>
 
@@ -14,10 +15,18 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include "project.h"
 #include "system-test/context.h"
 
+#include <omw/cli.h>
 #include <omw/string.h>
 
 
 using std::printf;
+
+namespace {
+
+constexpr int ewiWidth = 10;
+
+}
+
 
 
 void system_test::cli::printModuleTitle(const std::string& moduleName__func__)
@@ -31,6 +40,11 @@ void system_test::cli::printTestCaseTitle(const std::string& caseName__func__)
     omw::replaceAll(testCaseTitle, '_', ' ');
 
     printf(CLI_SGR_CYAN "  --======# " CLI_SGR_BCYAN "%s" CLI_SGR_CYAN " #======--" CLI_SGR_FG_DEFAULT "\n", testCaseTitle.c_str());
+}
+
+void system_test::cli::printUnassocTitle(const std::string& name)
+{
+    printf(CLI_SGR_BBLACK "  --======# " CLI_SGR_WHITE "%s" CLI_SGR_BBLACK " #======--" CLI_SGR_FG_DEFAULT "\n", name.c_str());
 }
 
 void system_test::cli::printResult(const system_test::Context& ctx)
@@ -122,6 +136,22 @@ void system_test::cli::printResult(const system_test::Context& ctx)
     */
 }
 
+void system_test::cli::printError(system_test::TestObejct& to, const std::string& text)
+{
+    to.counter().add(1, 0);
+
+    std::cout << omw::fgBrightRed << std::left << std::setw(ewiWidth) << "error:" << omw::defaultForeColor;
+    std::cout << text; // printFormattedText(text);
+    std::cout << std::endl;
+}
+
+void system_test::cli::printWarning(system_test::TestObejct& to, const std::string& text)
+{
+    std::cout << omw::fgBrightYellow << std::left << std::setw(ewiWidth) << "warning:" << omw::defaultForeColor;
+    std::cout << text; // printFormattedText(text);
+    std::cout << std::endl;
+}
+
 void system_test::cli::instruct(const std::string& text)
 {
     bool done = false;
@@ -136,7 +166,7 @@ void system_test::cli::instruct(const std::string& text)
     while (!done);
 }
 
-bool system_test::cli::check(system_test::TestObejct& tco, const std::string& text)
+bool system_test::cli::check(system_test::TestObejct& to, const std::string& text)
 {
     bool r;
 
@@ -144,12 +174,12 @@ bool system_test::cli::check(system_test::TestObejct& tco, const std::string& te
 
     if (ans == omw_::cli::ChoiceAnswer::A)
     {
-        tco.counter().add(1, 1);
+        to.counter().add(1, 1);
         r = true;
     }
     else
     {
-        tco.counter().add(1, 0);
+        to.counter().add(1, 0);
         r = false;
     }
 
