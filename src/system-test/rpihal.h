@@ -18,12 +18,12 @@ namespace system_test {
 /**
  * @brief Runs the system tests for the RPIHAL module.
  *
- * @param [in,out] ctx System test context
- * @return Status of the model detection
- * @retval 0 if the detected model is confirmed by the user
- * @retval -1 if the detected model is denied by the user
+ * If the detected model is confirmed by the user `modelDetectErr` is set to 0, if the detected model is denied by the
+ * user it's set to -1.
+ *
+ * @param [out] modelDetectErr Status of the model detection
  */
-int rpihal(system_test::Context& ctx);
+system_test::Module RPIHAL(int& modelDetectErr);
 
 
 

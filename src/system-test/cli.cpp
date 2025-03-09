@@ -20,14 +20,14 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 using std::printf;
 
 
-void system_test::cli::printModuleTitle(const std::string& module__func__)
+void system_test::cli::printModuleTitle(const std::string& moduleName__func__)
 {
-    printf(CLI_SGR_GREEN "  --======# " CLI_SGR_BGREEN "%s" CLI_SGR_GREEN " #======--" CLI_SGR_FG_DEFAULT "\n", module__func__.c_str());
+    printf(CLI_SGR_GREEN "  --======# " CLI_SGR_BGREEN "%s" CLI_SGR_GREEN " #======--" CLI_SGR_FG_DEFAULT "\n", moduleName__func__.c_str());
 }
 
-void system_test::cli::printTestCaseTitle(const std::string& testCase__func__)
+void system_test::cli::printTestCaseTitle(const std::string& caseName__func__)
 {
-    std::string testCaseTitle(testCase__func__);
+    std::string testCaseTitle(caseName__func__);
     omw::replaceAll(testCaseTitle, '_', ' ');
 
     printf(CLI_SGR_CYAN "  --======# " CLI_SGR_BCYAN "%s" CLI_SGR_CYAN " #======--" CLI_SGR_FG_DEFAULT "\n", testCaseTitle.c_str());
@@ -136,7 +136,7 @@ void system_test::cli::instruct(const std::string& text)
     while (!done);
 }
 
-bool system_test::cli::check(system_test::TestCaseCounter& tcc, const std::string& text)
+bool system_test::cli::check(system_test::TestObejct& tco, const std::string& text)
 {
     bool r;
 
@@ -144,12 +144,12 @@ bool system_test::cli::check(system_test::TestCaseCounter& tcc, const std::strin
 
     if (ans == omw_::cli::ChoiceAnswer::A)
     {
-        tcc.add(1, 1);
+        tco.counter().add(1, 1);
         r = true;
     }
     else
     {
-        tcc.add(1, 0);
+        tco.counter().add(1, 0);
         r = false;
     }
 

@@ -117,12 +117,13 @@ int main(int argc, char** argv)
     {
         system_test::Context ctx;
 
-        const int modelDetectErr = system_test::rpihal(ctx);
+        int modelDetectErr = (-1);
+        ctx.add(system_test::RPIHAL(modelDetectErr));
 
         if (modelDetectErr != 0) { r = EC_MODEL_DETECT_FAILED; }
 
-        // if ((argFlags & ARG_FLAG_GPIO) && (modelDetectErr == 0)) { system_test::gpio(ctx); }
-        // if ((argFlags & ARG_FLAG_SPI) && (modelDetectErr == 0)) { system_test::spi(ctx); }
+        // if ((argFlags & ARG_FLAG_GPIO) && !modelDetectErr) { ctx.add(system_test::gpio()); }
+        // if ((argFlags & ARG_FLAG_SPI) && !modelDetectErr) { ctx.add(system_test::spi()); }
         //  ...
 
         system_test::cli::printResult(ctx);

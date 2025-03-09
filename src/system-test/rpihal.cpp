@@ -22,23 +22,17 @@ using namespace system_test;
 
 
 
-static system_test::TestCaseCounter Model_Detection(int& modelDetectErr);
+static system_test::Case Model_Detection(int& modelDetectErr);
 
 
 
-int system_test::rpihal(system_test::Context& ctx)
+system_test::Module system_test::RPIHAL(int& modelDetectErr)
 {
-    int modelDetectErr = (-1);
+    Module module(__func__);
 
-    system_test::TestCaseCounter testCaseCnt;
+    module.add(Model_Detection(modelDetectErr));
 
-    cli::printModuleTitle(__func__);
-
-    testCaseCnt.add(Model_Detection(modelDetectErr));
-
-    ctx.addCounter(testCaseCnt);
-
-    return modelDetectErr;
+    return module;
 }
 
 std::string system_test::util::model_to_string(uint64_t model)
@@ -166,15 +160,23 @@ void system_test::util::printModelDetectionInfo()
 
 
 
-system_test::TestCaseCounter Model_Detection(int& modelDetectErr)
+system_test::Case Model_Detection(int& modelDetectErr)
 {
-    TestCaseCounter tcc;
-    cli::printTestCaseTitle(__func__);
+    Case tc(__func__);
 
-    system_test::util::printModelDetectionInfo();
-    const bool modelDetectOk = cli::check(tcc, "does the detected model match the current board?");
+
+
+    const RPIHAL_model_t model = RPIHAL_getModel();
+    const std::string modelStr = system_test::util::model_to_string(model);
+
+    bool modelDetectOk = false;
+
+    if (model != RPIHAL_model_unknown) { modelDetectOk = cli::check(tc, "is the current board a model " + modelStr + "?"); }
+    else { tc.counter().add(1, 0); }
 
     modelDetectErr = (modelDetectOk ? 0 : (-1));
 
-    return tcc;
+
+
+    return tc;
 }

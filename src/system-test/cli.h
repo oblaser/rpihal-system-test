@@ -55,8 +55,8 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 namespace system_test {
 namespace cli {
 
-    void printModuleTitle(const std::string& module__func__);
-    void printTestCaseTitle(const std::string& testCase__func__);
+    void printModuleTitle(const std::string& moduleName__func__);
+    void printTestCaseTitle(const std::string& caseName__func__);
     void printResult(const system_test::Context& ctx);
 
     /**
@@ -69,12 +69,12 @@ namespace cli {
     /**
      * Prints the yes/no question and waits until the user answered. Updates total and OK counters accordingly.
      *
-     * @param [in,out] tcc Current test case counter
+     * @param [in,out] tco Current test module or case
      * @param text The question text
      * @retval true If the user answered `y`
      * @retval false If the user answered `n`
      */
-    bool check(system_test::TestCaseCounter& tcc, const std::string& text);
+    bool check(system_test::TestObejct& tco, const std::string& text);
 
 } // namespace cli
 } // namespace system_test

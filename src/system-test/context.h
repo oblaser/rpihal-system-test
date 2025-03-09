@@ -8,6 +8,7 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 
 #include <cstddef>
 #include <cstdint>
+#include <string>
 
 
 namespace system_test {
@@ -39,6 +40,52 @@ private:
     size_t m_ok;
 };
 
+
+
+class TestObejct
+{
+public:
+    TestObejct()
+        : m_counter()
+    {}
+
+    virtual ~TestObejct() {}
+
+    TestCaseCounter& counter() { return m_counter; }
+    const TestCaseCounter& counter() const { return m_counter; }
+
+protected:
+    TestCaseCounter m_counter;
+};
+
+
+
+class Case : public TestObejct
+{
+public:
+    Case() = delete;
+
+    explicit Case(const std::string& caseName__func__);
+
+    virtual ~Case() {}
+};
+
+
+
+class Module : public TestObejct
+{
+public:
+    Module() = delete;
+
+    explicit Module(const std::string& moduleName__func__);
+
+    virtual ~Module() {}
+
+    void add(const Case& testCase) { m_counter.add(testCase.counter()); }
+};
+
+
+
 class Context
 {
 public:
@@ -48,7 +95,7 @@ public:
 
     virtual ~Context() {}
 
-    void addCounter(const TestCaseCounter& counter) { m_counter.add(counter); }
+    void add(const Module& module) { m_counter.add(module.counter()); }
 
     const TestCaseCounter& counter() const { return m_counter; }
 
