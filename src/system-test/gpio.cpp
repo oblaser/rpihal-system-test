@@ -22,6 +22,7 @@ using namespace system_test;
 
 
 static system_test::Case PullUp_PullDown();
+static system_test::Case Input();
 
 static void initGpioPin(system_test::TestObejct& to, int pin, const RPIHAL_GPIO_init_t* initStruct) noexcept(false);
 static void initGpioPins(system_test::TestObejct& to, uint64_t bits, const RPIHAL_GPIO_init_t* initStruct) noexcept(false);
@@ -43,6 +44,7 @@ system_test::Module system_test::GPIO()
     Module module(__func__);
 
     module.add(PullUp_PullDown());
+    module.add(Input());
 
     resetGpioPins(module);
 
@@ -55,11 +57,10 @@ system_test::Case PullUp_PullDown()
 {
     Case tc(__func__);
 
+    constexpr uint64_t ledPinsBits = (RPIHAL_GPIO_BIT(GPIO_LED0) | RPIHAL_GPIO_BIT(GPIO_LED1));
     RPIHAL_GPIO_init_t initStruct;
     RPIHAL_GPIO_defaultInitStruct(&initStruct);
     initStruct.mode = RPIHAL_GPIO_MODE_IN;
-
-    const uint64_t ledPinsBits = (RPIHAL_GPIO_pintobit(GPIO_LED0) | RPIHAL_GPIO_pintobit(GPIO_LED1));
 
     try
     {
@@ -83,6 +84,19 @@ system_test::Case PullUp_PullDown()
 
     try
     {
+        initStruct.pull = RPIHAL_GPIO_PULL_UP;
+        initGpioPin(tc, GPIO_LED0, &initStruct);
+
+        initStruct.pull = RPIHAL_GPIO_PULL_DOWN;
+        initGpioPin(tc, GPIO_LED1, &initStruct);
+
+        cli::check(tc, "is LED0 on and LED1 off?");
+    }
+    catch (...)
+    {}
+
+    try
+    {
         initStruct.pull = RPIHAL_GPIO_PULL_DOWN;
         initGpioPin(tc, GPIO_LED0, &initStruct);
 
@@ -94,18 +108,42 @@ system_test::Case PullUp_PullDown()
     catch (...)
     {}
 
-    try
-    {
-        initStruct.pull = RPIHAL_GPIO_PULL_UP;
-        initGpioPin(tc, GPIO_LED0, &initStruct);
+    return tc;
+}
 
-        initStruct.pull = RPIHAL_GPIO_PULL_DOWN;
-        initGpioPin(tc, GPIO_LED1, &initStruct);
+system_test::Case Input()
+{
+    Case tc(__func__);
 
-        cli::check(tc, "is LED0 on and LED1 off?");
-    }
-    catch (...)
-    {}
+    RPIHAL_GPIO_init_t initStruct;
+    RPIHAL_GPIO_defaultInitStruct(&initStruct);
+
+    initStruct.mode = RPIHAL_GPIO_MODE_IN;
+    initStruct.pull = RPIHAL_GPIO_PULL_NONE;
+
+    // ignore result, already prints warnings and errors, and buttons are not directly connected
+    RPIHAL_GPIO_initPins((RPIHAL_GPIO_BIT(GPIO_BTN0) | RPIHAL_GPIO_BIT(GPIO_BTN1)), &initStruct);
+
+    if (RPIHAL_GPIO_readPin(GPIO_BTN0) > 0) { cli::printWarning(tc, "BTN0 is pressed"); }
+    if (RPIHAL_GPIO_readPin(GPIO_BTN1) > 0) { cli::printWarning(tc, "BTN1 is pressed"); }
+
+
+
+    cli::instruct("press and hold BTN0");
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN0) == 1);
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN1) == 0);
+
+    cli::instruct("press and hold BTN1");
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN0) == 0);
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN1) == 1);
+
+    cli::instruct("press and hold BTN0 and BTN1");
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN0) == 1);
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN1) == 1);
+
+    cli::instruct("release BTN0 and BTN1");
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN0) == 0);
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN1) == 0);
 
     return tc;
 }
