@@ -52,6 +52,8 @@ public:
 
     const TestCaseCounter& counter() const { return m_counter; }
 
+    const bool allOk() const { return (m_counter.total() == m_counter.ok()); }
+
 private:
     TestCaseCounter m_counter;
 };

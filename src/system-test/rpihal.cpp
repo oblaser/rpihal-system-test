@@ -8,42 +8,21 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include <cstdio>
 #include <string>
 
-#include "middleware/util.h"
 #include "project.h"
 #include "rpihal.h"
+#include "system-test/cli.h"
 #include "system-test/context.h"
 
-#include <omw/string.h>
 #include <rpihal/rpihal.h>
 
 
 using std::printf;
 
-namespace {
+using namespace system_test;
 
-system_test::TestCaseCounter Model_Detection(int& modelDetectErr)
-{
-    system_test::TestCaseCounter r(1, 0);
 
-    omw::string testCaseTitle(__func__);
-    testCaseTitle.replaceAll('_', ' ');
-    printf("\033[36m  --======# \033[96m%s\033[36m #======--\033[39m\n", testCaseTitle.c_str());
 
-    system_test::util::printModelDetectionInfo();
-
-    const auto ans = omw_::cli::choice("\033[97mdoes the detected model match the board which this is running on?\033[39m");
-
-    if (ans == omw_::cli::ChoiceAnswer::A)
-    {
-        modelDetectErr = 0;
-        r.incOk();
-    }
-    else { modelDetectErr = (-1); }
-
-    return r;
-}
-
-} // namespace
+static system_test::TestCaseCounter Model_Detection(int& modelDetectErr);
 
 
 
@@ -53,7 +32,7 @@ int system_test::rpihal(system_test::Context& ctx)
 
     system_test::TestCaseCounter testCaseCnt;
 
-    printf("\033[32m  --======# \033[92m%s\033[32m #======--\033[39m\n", __func__);
+    cli::printModuleTitle(__func__);
 
     testCaseCnt.add(Model_Detection(modelDetectErr));
 
@@ -61,8 +40,6 @@ int system_test::rpihal(system_test::Context& ctx)
 
     return modelDetectErr;
 }
-
-
 
 std::string system_test::util::model_to_string(uint64_t model)
 {
@@ -185,4 +162,19 @@ void system_test::util::printModelDetectionInfo()
     const std::string modelStr = system_test::util::model_to_string(model);
 
     printf("detected model:         %s\n", modelStr.c_str());
+}
+
+
+
+system_test::TestCaseCounter Model_Detection(int& modelDetectErr)
+{
+    TestCaseCounter tcc;
+    cli::printTestCaseTitle(__func__);
+
+    system_test::util::printModelDetectionInfo();
+    const bool modelDetectOk = cli::check(tcc, "does the detected model match the current board?");
+
+    modelDetectErr = (modelDetectOk ? 0 : (-1));
+
+    return tcc;
 }

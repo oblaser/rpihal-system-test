@@ -9,6 +9,7 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #include "middleware/gpio.h"
 #include "middleware/util.h"
 #include "project.h"
+#include "system-test/cli.h"
 #include "system-test/context.h"
 #include "system-test/rpihal.h"
 
@@ -124,11 +125,7 @@ int main(int argc, char** argv)
         // if ((argFlags & ARG_FLAG_SPI) && (modelDetectErr == 0)) { system_test::spi(ctx); }
         //  ...
 
-        printf("\n");
-        printf("test cases: %llu/%llu\n", (long long unsigned)ctx.counter().ok(), (long long unsigned)ctx.counter().total());
-        printf("\n");
-        printf("========================================================================\n");
-        printf("\n");
+        system_test::cli::printResult(ctx);
     }
 
     // system test cases

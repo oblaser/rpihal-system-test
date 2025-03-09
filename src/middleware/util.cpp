@@ -89,6 +89,7 @@ int util::sleep(unsigned t_ms)
 
 #include <iostream>
 #include <string>
+
 omw_::cli::ChoiceAnswer omw_::cli::choice(const std::string& question, const ChoiceAnswer& defaultOption, char optionA, char optionB)
 {
     ChoiceAnswer r = ChoiceAnswer::none;
@@ -98,7 +99,8 @@ omw_::cli::ChoiceAnswer omw_::cli::choice(const std::string& question, const Cho
 
     do {
         std::cout << question << " [" << (defaultOption == ChoiceAnswer::A ? a.toUpper_ascii() : a) << "/"
-                  << (defaultOption == ChoiceAnswer::B ? b.toUpper_ascii() : b) << "] ";
+                  << (defaultOption == ChoiceAnswer::B ? b.toUpper_ascii() : b) << "] " << std::flush;
+
         std::getline(std::cin, data);
 
         if (data.toLower_ascii() == a) { r = ChoiceAnswer::A; }
