@@ -55,8 +55,8 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 namespace system_test {
 namespace cli {
 
-    void printModuleTitle(const std::string& moduleName__func__);
-    void printTestCaseTitle(const std::string& caseName__func__);
+    void printModuleTitle(const std::string& name);
+    void printTestCaseTitle(const std::string& name);
     void printUnassocTitle(const std::string& name);
 
     void printResult(const system_test::Context& ctx);

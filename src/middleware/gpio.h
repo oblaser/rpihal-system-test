@@ -9,16 +9,10 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #include <cstddef>
 #include <cstdint>
 
+#include "gpio-pins.h"
 #include "project.h"
 
 #include <rpihal/gpio.h>
-
-
-#define GPIO_LED0 (27)
-#define GPIO_LED1 (22)
-
-#define GPIO_BTN0 (23)
-#define GPIO_BTN1 (24)
 
 
 namespace gpio {

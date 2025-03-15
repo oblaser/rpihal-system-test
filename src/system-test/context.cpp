@@ -10,6 +10,8 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include "context.h"
 #include "system-test/cli.h"
 
+#include <omw/string.h>
+
 
 namespace system_test {
 
@@ -26,21 +28,44 @@ void TestCaseCounter::add(const TestCaseCounter& counter)
 }
 
 TestObejct::TestObejct(const std::string& name)
-    : m_counter()
+    : m_counter(), m_messages(), m_name(name)
 {
-    cli::printUnassocTitle(name);
+    // this->setName(name); not here
+
+    cli::printUnassocTitle(this->name());
 }
 
-Case::Case(const std::string& caseName__func__)
-    : TestObejct()
+void TestObejct::setName(const std::string& name)
 {
-    cli::printTestCaseTitle(caseName__func__);
+    m_name = name;
+    omw::replaceAll(m_name, '_', ' ');
 }
 
-Module::Module(const std::string& moduleName__func__)
+Case::Case(const std::string& name)
     : TestObejct()
 {
-    cli::printModuleTitle(moduleName__func__);
+    this->setName(name);
+
+    cli::printTestCaseTitle(this->name());
+}
+
+Module::Module(const std::string& name)
+    : TestObejct()
+{
+    this->setName(name);
+
+    cli::printModuleTitle(this->name());
+}
+
+void Module::add(const Case& testCase)
+{
+    m_counter.add(testCase.counter());
+
+    for (size_t i = 0; i < testCase.messages().size(); ++i)
+    {
+        const Message msg(this->name() + " -> " + testCase.messages()[i].name(), testCase.messages()[i].message());
+        m_messages.push_back(msg);
+    }
 }
 
 } // namespace system_test

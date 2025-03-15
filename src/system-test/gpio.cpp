@@ -7,8 +7,8 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include <cstdint>
 #include <string>
 
+#include "gpio-pins.h"
 #include "gpio.h"
-#include "middleware/gpio.h" // only for GPIO numbers defines
 #include "project.h"
 #include "system-test/cli.h"
 #include "system-test/context.h"
@@ -27,6 +27,7 @@ static system_test::Case Output();
 
 static void initGpioPin(system_test::TestObejct& to, int pin, const RPIHAL_GPIO_init_t* initStruct) noexcept(false);
 static void initGpioPins(system_test::TestObejct& to, uint64_t bits, const RPIHAL_GPIO_init_t* initStruct) noexcept(false);
+static void assertGpioRead(system_test::Case& tc, uint64_t mask, uint64_t expectedValue);
 static void resetGpioPins(system_test::TestObejct& to);
 
 
@@ -63,6 +64,8 @@ system_test::Case PullUp_PullDown()
     RPIHAL_GPIO_init_t initStruct;
     RPIHAL_GPIO_defaultInitStruct(&initStruct);
     initStruct.mode = RPIHAL_GPIO_MODE_IN;
+
+
 
     try
     {
@@ -110,6 +113,11 @@ system_test::Case PullUp_PullDown()
     catch (...)
     {}
 
+
+
+    RPIHAL_GPIO_resetPin(GPIO_LED0);
+    RPIHAL_GPIO_resetPin(GPIO_LED1);
+
     return tc;
 }
 
@@ -133,32 +141,29 @@ system_test::Case Input()
 
 
     cli::instruct("press and hold BTN0");
-    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN0) == 1);
-    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN1) == 0);
-    tc.assert(((uint64_t)RPIHAL_GPIO_read() & pinBits) == RPIHAL_GPIO_BIT(GPIO_BTN0));
-    tc.assert((RPIHAL_GPIO_read64() & pinBits) == RPIHAL_GPIO_BIT(GPIO_BTN0));
-    // RPIHAL_GPIO_readHi() would need a compute module
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN0) == 1, "BTN0 is not high");
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN1) == 0, "BTN1 is not low");
+    assertGpioRead(tc, pinBits, RPIHAL_GPIO_BIT(GPIO_BTN0));
 
     cli::instruct("press and hold BTN1");
-    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN0) == 0);
-    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN1) == 1);
-    tc.assert(((uint64_t)RPIHAL_GPIO_read() & pinBits) == RPIHAL_GPIO_BIT(GPIO_BTN1));
-    tc.assert((RPIHAL_GPIO_read64() & pinBits) == RPIHAL_GPIO_BIT(GPIO_BTN1));
-    // RPIHAL_GPIO_readHi() would need a compute module
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN0) == 0, "BTN0 is not low");
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN1) == 1, "BTN1 is not high");
+    assertGpioRead(tc, pinBits, RPIHAL_GPIO_BIT(GPIO_BTN1));
 
     cli::instruct("press and hold BTN0 and BTN1");
-    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN0) == 1);
-    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN1) == 1);
-    tc.assert(((uint64_t)RPIHAL_GPIO_read() & pinBits) == pinBits);
-    tc.assert((RPIHAL_GPIO_read64() & pinBits) == pinBits);
-    // RPIHAL_GPIO_readHi() would need a compute module
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN0) == 1, "BTN0 is not high");
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN1) == 1, "BTN1 is not high");
+    assertGpioRead(tc, pinBits, pinBits);
 
     cli::instruct("release BTN0 and BTN1");
-    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN0) == 0);
-    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN1) == 0);
-    tc.assert(((uint64_t)RPIHAL_GPIO_read() & pinBits) == 0llu);
-    tc.assert((RPIHAL_GPIO_read64() & pinBits) == 0llu);
-    // RPIHAL_GPIO_readHi() would need a compute module
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN0) == 0, "BTN0 is not low");
+    tc.assert(RPIHAL_GPIO_readPin(GPIO_BTN1) == 0, "BTN1 is not low");
+    assertGpioRead(tc, pinBits, 0);
+
+
+
+    RPIHAL_GPIO_resetPin(GPIO_BTN0);
+    RPIHAL_GPIO_resetPin(GPIO_BTN1);
 
     return tc;
 }
@@ -173,7 +178,7 @@ system_test::Case Output()
     initStruct.mode = RPIHAL_GPIO_MODE_OUT;
     initStruct.pull = RPIHAL_GPIO_PULL_NONE;
 
-    initGpioPins(tc, pinBits, &initStruct);
+    CTX_REQUIRE(tc, (RPIHAL_GPIO_initPins(pinBits, &initStruct) == 0), "failed to init pins");
 
 
 
@@ -195,7 +200,12 @@ system_test::Case Output()
 
     RPIHAL_GPIO_togglePin(GPIO_LED0);
     RPIHAL_GPIO_togglePin(GPIO_LED1);
-    cli::check(tc, "is LED0 on and LED1 off?");
+    cli::check(tc, "is LED0 on and LED1 off? (toggle)");
+
+
+
+    RPIHAL_GPIO_resetPin(GPIO_LED0);
+    RPIHAL_GPIO_resetPin(GPIO_LED1);
 
     return tc;
 }
@@ -224,6 +234,33 @@ void initGpioPins(system_test::TestObejct& to, uint64_t bits, const RPIHAL_GPIO_
         system_test::cli::printError(to, msg);
         throw -(__LINE__);
     }
+}
+
+void assertGpioRead(system_test::Case& tc, uint64_t mask, uint64_t expectedValue)
+{
+    const uint32_t valueLo = RPIHAL_GPIO_read();
+    const uint32_t valueHi = RPIHAL_GPIO_readHi();
+    const uint64_t value = RPIHAL_GPIO_read64();
+
+    printf("32 %08x%08x\n", valueHi, valueLo);
+    printf("64 %016llx\n", value);
+
+    const uint32_t maskLo = (uint32_t)(mask);
+    const uint32_t maskHi = (uint32_t)(mask >> 32);
+
+    const uint32_t expectedValueLo = (uint32_t)(expectedValue);
+    const uint32_t expectedValueHi = (uint32_t)(expectedValue >> 32);
+
+
+
+    CTX_CHECK(tc, ((valueLo & maskLo) == expectedValueLo),
+              "RPIHAL_GPIO_read() returned " + omw::toHexStr(valueLo) + ", mask: " + omw::toHexStr(maskLo) + ", expected: " + omw::toHexStr(expectedValueLo));
+
+    CTX_CHECK(tc, ((valueHi & maskHi) == expectedValueHi),
+              "RPIHAL_GPIO_readHi() returned " + omw::toHexStr(valueHi) + ", mask: " + omw::toHexStr(maskHi) + ", expected: " + omw::toHexStr(expectedValueHi));
+
+    CTX_CHECK(tc, ((value & mask) == expectedValue),
+              "RPIHAL_GPIO_read64() returned " + omw::toHexStr(value) + ", mask: " + omw::toHexStr(mask) + ", expected: " + omw::toHexStr(expectedValue));
 }
 
 void resetGpioPins(system_test::TestObejct& to)

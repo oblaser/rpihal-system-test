@@ -16,7 +16,6 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include "system-test/context.h"
 
 #include <omw/cli.h>
-#include <omw/string.h>
 
 
 using std::printf;
@@ -29,17 +28,14 @@ constexpr int ewiWidth = 10;
 
 
 
-void system_test::cli::printModuleTitle(const std::string& moduleName__func__)
+void system_test::cli::printModuleTitle(const std::string& name)
 {
-    printf(CLI_SGR_GREEN "  --======# " CLI_SGR_BGREEN "%s" CLI_SGR_GREEN " #======--" CLI_SGR_FG_DEFAULT "\n", moduleName__func__.c_str());
+    printf(CLI_SGR_GREEN "  --======# " CLI_SGR_BGREEN "%s" CLI_SGR_GREEN " #======--" CLI_SGR_FG_DEFAULT "\n", name.c_str());
 }
 
-void system_test::cli::printTestCaseTitle(const std::string& caseName__func__)
+void system_test::cli::printTestCaseTitle(const std::string& name)
 {
-    std::string testCaseTitle(caseName__func__);
-    omw::replaceAll(testCaseTitle, '_', ' ');
-
-    printf(CLI_SGR_CYAN "  --======# " CLI_SGR_BCYAN "%s" CLI_SGR_CYAN " #======--" CLI_SGR_FG_DEFAULT "\n", testCaseTitle.c_str());
+    printf(CLI_SGR_CYAN "  --======# " CLI_SGR_BCYAN "%s" CLI_SGR_CYAN " #======--" CLI_SGR_FG_DEFAULT "\n", name.c_str());
 }
 
 void system_test::cli::printUnassocTitle(const std::string& name)
@@ -50,6 +46,19 @@ void system_test::cli::printUnassocTitle(const std::string& name)
 void system_test::cli::printResult(const system_test::Context& ctx)
 {
     printf("\n");
+
+    if (!ctx.messages().empty())
+    {
+        printf("\n");
+
+        for (size_t i = 0; i < ctx.messages().size(); ++i)
+        {
+            const auto& msg = ctx.messages()[i];
+            std::cout << std::left << std::setw(30) << msg.name() << " " << msg.message() << std::endl;
+        }
+
+        printf("\n");
+    }
 
     const unsigned long long ok = ctx.counter().ok();
     const unsigned long long total = ctx.counter().total();
@@ -168,20 +177,11 @@ void system_test::cli::instruct(const std::string& text)
 
 bool system_test::cli::check(system_test::TestObejct& to, const std::string& text)
 {
-    bool r;
+    const char optionB = 'n';
+    const auto ans = omw_::cli::choice(CLI_SGR_BWHITE + text + CLI_SGR_FG_DEFAULT, omw_::cli::ChoiceAnswer::none, 'y', optionB);
 
-    const auto ans = omw_::cli::choice(CLI_SGR_BWHITE + text + CLI_SGR_FG_DEFAULT, omw_::cli::ChoiceAnswer::none, 'y', 'n');
-
-    if (ans == omw_::cli::ChoiceAnswer::A)
-    {
-        to.counter().add(1, 1);
-        r = true;
-    }
-    else
-    {
-        to.counter().add(1, 0);
-        r = false;
-    }
+    const bool r = (ans == omw_::cli::ChoiceAnswer::A);
+    to.assert(r, text + " " + optionB);
 
     return r;
 }
