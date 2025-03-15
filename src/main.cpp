@@ -14,6 +14,7 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #include "system-test/gpio.h"
 #include "system-test/i2c.h"
 #include "system-test/rpihal.h"
+#include "system-test/spi.h"
 
 #include <omw/cli.h>
 #include <omw/defs.h>
@@ -129,6 +130,11 @@ int main(int argc, char** argv)
 
 
 
+        // if (r == EC_OK) { ctx.add(system_test::SYS()); } // TODO
+
+
+
+        // init RPIHAL GPIO if needed
         if ((r == EC_OK) && (argFlags & (ARG_FLAG_GPIO | ARG_FLAG_SPI)))
         {
             const auto tmp = system_test::GPIO_init();
@@ -137,11 +143,10 @@ int main(int argc, char** argv)
             if (!tmp.allOk()) { r = EC_RPIHAL_INIT_ERROR; }
         }
 
-
-
         if ((r == EC_OK) && (argFlags & ARG_FLAG_GPIO)) { ctx.add(system_test::GPIO()); }
-        // if ((r == EC_OK) && (argFlags & ARG_FLAG_SPI)) { ctx.add(system_test::SPI()); }
+        if ((r == EC_OK) && (argFlags & ARG_FLAG_SPI)) { ctx.add(system_test::SPI()); }
         if ((r == EC_OK) && (argFlags & ARG_FLAG_I2C)) { ctx.add(system_test::I2C()); }
+        // if ((r == EC_OK) && (argFlags & ARG_FLAG_UART)) { ctx.add(system_test::UART()); } // TODO
 
         system_test::cli::printResult(ctx);
     }

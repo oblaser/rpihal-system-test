@@ -93,56 +93,6 @@ void system_test::cli::printResult(const system_test::Context& ctx)
     }
 
     printf("\n");
-
-
-
-    /* catch2 OK result:
-
-    ===============================================================================
-    All tests passed (6786 assertions in 127 test cases)
-
-
-
-    \033[92m===============================================================================\033[39m
-    \033[92mAll tests passed\033[39m (6786 assertions in 127 test cases)
-
-    */
-
-    /* catch2 failed result:
-
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    omw-unit-test-static is a Catch v2.13.7 host application.
-    Run with -? for options
-
-    -------------------------------------------------------------------------------
-    int.h macros
-    -------------------------------------------------------------------------------
-    /home/jon/prj/rpihal-system-test/sdk/omw/tests/unit/int.hpp:26
-    ...............................................................................
-
-    /home/jon/prj/rpihal-system-test/sdk/omw/tests/unit/int.hpp:36: FAILED:
-    CHECK( false )
-
-    -------------------------------------------------------------------------------
-    vector.h omw::vector ctor
-    -------------------------------------------------------------------------------
-    /home/jon/prj/rpihal-system-test/sdk/omw/tests/unit/vector.hpp:36
-    ...............................................................................
-
-    /home/jon/prj/rpihal-system-test/sdk/omw/tests/unit/vector.hpp:43: FAILED:
-    CHECK( false )
-
-    ===============================================================================
-    test cases:  127 |  125 passed | 2 failed
-    assertions: 6788 | 6786 passed | 2 failed
-
-
-
-    \033[91m=\033[32m==============================================================================\033[39m
-    test cases:  127 | \033[32m 125 passed\033[39m | \033[91m2 failed\033[39m
-    assertions: 6788 | \033[32m6786 passed\033[39m | \033[91m2 failed\033[39m
-
-    */
 }
 
 void system_test::cli::printError(system_test::TestObejct& to, const std::string& text)

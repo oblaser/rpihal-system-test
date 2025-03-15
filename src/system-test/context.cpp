@@ -63,7 +63,11 @@ void Module::add(const Case& testCase)
 
     for (size_t i = 0; i < testCase.messages().size(); ++i)
     {
-        const Message msg(this->name() + " -> " + testCase.messages()[i].name(), testCase.messages()[i].message());
+        constexpr size_t moduleNameWidth = 10;
+        const size_t nFill = moduleNameWidth - this->name().length();
+
+        const Message msg(this->name() + std::string(nFill + 1, ' ') + testCase.messages()[i].name(), testCase.messages()[i].message());
+
         m_messages.push_back(msg);
     }
 }
