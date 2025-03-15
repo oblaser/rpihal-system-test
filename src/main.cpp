@@ -12,6 +12,7 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #include "system-test/cli.h"
 #include "system-test/context.h"
 #include "system-test/gpio.h"
+#include "system-test/i2c.h"
 #include "system-test/rpihal.h"
 
 #include <omw/cli.h>
@@ -76,7 +77,10 @@ int main(int argc, char** argv)
             argv[0],
 
             arg_test,
-            arg_all,
+            //arg_gpio,
+            arg_spi,
+            arg_i2c,
+            //arg_all,
 
             //arg_app,
         };
@@ -136,8 +140,8 @@ int main(int argc, char** argv)
 
 
         if ((r == EC_OK) && (argFlags & ARG_FLAG_GPIO)) { ctx.add(system_test::GPIO()); }
-        // if ((r == EC_OK) && (argFlags & ARG_FLAG_SPI)) { ctx.add(system_test::spi()); }
-        // ...
+        // if ((r == EC_OK) && (argFlags & ARG_FLAG_SPI)) { ctx.add(system_test::SPI()); }
+        if ((r == EC_OK) && (argFlags & ARG_FLAG_I2C)) { ctx.add(system_test::I2C()); }
 
         system_test::cli::printResult(ctx);
     }

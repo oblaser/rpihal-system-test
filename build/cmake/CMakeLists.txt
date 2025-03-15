@@ -61,6 +61,7 @@ set(SOURCES
 ../../src/system-test/cli.cpp
 ../../src/system-test/context.cpp
 ../../src/system-test/gpio.cpp
+../../src/system-test/i2c.cpp
 ../../src/system-test/rpihal.cpp
 ../../src/main.cpp
 )
