@@ -38,7 +38,7 @@ If the binary is run without any options, only the detected model is printed, no
 The test hardware is a custom board. [Schematic](https://static.oblaser.ch/rpihal/rpihal-test-board-rev00_SCM.pdf)
 
 Add to `/boot/firmware/config.txt`:
-```ini
+```
 dtoverlay=spi0-1cs
-dtoverlay=i2c1
+dtoverlay=i2c1,i2c1_baudrate=400000
 ```
