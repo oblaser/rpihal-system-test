@@ -8,6 +8,7 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include <string>
 
 #include "app.h"
+#include "middleware/adc.h"
 #include "middleware/gpio.h"
 #include "middleware/led-bar.h"
 #include "project.h"
@@ -97,10 +98,11 @@ void app::task()
 
     case S_update:
 
-        // TODO
-        potPos = ((float)(time(0) % 9) / 8.0f);
-        tempCPU = 8.75f;
-        tempPCB = 3.7499f;
+        potPos = adc::readPoti().norm();
+
+        RPIHAL_SYS_getCpuTemp(&tempCPU);
+
+        tempPCB = 3.7499f; // TODO
 
         setLedBar();
 

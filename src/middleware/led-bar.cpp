@@ -48,7 +48,7 @@ int ledBar::init()
         return -(__LINE__);
     }
 
-    err = RPIHAL_SPI_open(spi, "/dev/spidev0.0", 811000, RPIHAL_SPI_MODE_0, RPIHAL_SPI_CFG_FLAG_NO_CS);
+    err = RPIHAL_SPI_open(spi, "/dev/spidev0.0", 411000, RPIHAL_SPI_MODE_0, RPIHAL_SPI_CFG_FLAG_NO_CS);
     if (err)
     {
         LOG_ERR("failed to open SPI, err: %i, errno: %i %s", err, errno, std::strerror(errno));

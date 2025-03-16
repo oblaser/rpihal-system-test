@@ -7,6 +7,7 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #include <cstdint>
 
 #include "application/app.h"
+#include "middleware/adc.h"
 #include "middleware/gpio.h"
 #include "middleware/led-bar.h"
 #include "middleware/util.h"
@@ -160,7 +161,9 @@ int main(int argc, char** argv)
 
     if ((r == EC_OK) && (argFlags & ARG_FLAG_APP))
     {
+        if (adc::init()) { r = EC_ERROR; }
         if (ledBar::init()) { r = EC_ERROR; }
+
         if (gpio::init()) { r = EC_RPIHAL_INIT_ERROR; }
 
 #if defined(PRJ_DEBUG) && 0
@@ -180,6 +183,7 @@ int main(int argc, char** argv)
             util::sleep(5);
         }
 
+        adc::deinit();
         gpio::deinit();
         ledBar::deinit();
     }
