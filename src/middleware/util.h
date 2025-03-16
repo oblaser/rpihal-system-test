@@ -55,7 +55,7 @@ namespace cli {
 }
 #endif
 
-}
+} // namespace omw_
 
 
 

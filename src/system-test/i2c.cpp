@@ -104,7 +104,7 @@ system_test::Case Read_Temp()
     const int16_t tempRegister = omw::bigEndian::decode_i16(buffer);
     const float temp = (float)tempRegister * 0.0625f / 16.0f;
 
-    cli::check(tc, "is the read temperaature of " + std::to_string(temp) + OMW_UTF8CP_deg "C plausible?");
+    cli::check(tc, "is the read PCB temperaature of " + std::to_string(temp) + OMW_UTF8CP_deg "C plausible?");
 
 
 
