@@ -25,7 +25,6 @@ using namespace system_test;
 
 
 
-// added `dtoverlay=i2c1` to top of "/boot/firmware/config.txt"
 static const char* const dev_i2c = "/dev/i2c-1";
 
 

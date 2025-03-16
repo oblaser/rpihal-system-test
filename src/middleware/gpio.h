@@ -29,7 +29,7 @@ int init();
  *
  * @return 0 on success
  */
-int reset();
+void deinit();
 
 void task();
 

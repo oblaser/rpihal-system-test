@@ -6,7 +6,9 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #include <cstddef>
 #include <cstdint>
 
+#include "application/app.h"
 #include "middleware/gpio.h"
+#include "middleware/led-bar.h"
 #include "middleware/util.h"
 #include "project.h"
 #include "system-test/cli.h"
@@ -78,13 +80,13 @@ int main(int argc, char** argv)
         static char* ___dbg_argv[] = {
             argv[0],
 
-            arg_test,
+            //arg_test,
             //arg_gpio,
             //arg_spi,
             //arg_i2c,
             //arg_all,
 
-            //arg_app,
+            arg_app,
         };
         // clang-format on
 
@@ -158,8 +160,8 @@ int main(int argc, char** argv)
 
     if ((r == EC_OK) && (argFlags & ARG_FLAG_APP))
     {
-        const int err = gpio::init();
-        if (err) { r = EC_RPIHAL_INIT_ERROR; }
+        if (ledBar::init()) { r = EC_ERROR; }
+        if (gpio::init()) { r = EC_RPIHAL_INIT_ERROR; }
 
 #if defined(PRJ_DEBUG) && 0
         RPIHAL_GPIO_dumpAltFuncReg(0x3c0000);
@@ -173,24 +175,13 @@ int main(int argc, char** argv)
         )
         {
             gpio::task();
-
-            if (gpio::btn0->pos()) { LOG_INF("BTN0 pos"); }
-            if (gpio::btn0->neg()) { LOG_INF("BTN0 neg"); }
-
-            if (gpio::btn1->pos())
-            {
-                LOG_INF("BTN1 pos");
-                gpio::led1->toggle();
-            }
-
-            if (gpio::btn1->neg()) { LOG_INF("BTN1 neg"); }
-
-            gpio::led0->write(gpio::btn0->state());
+            app::task();
 
             util::sleep(5);
         }
 
-        gpio::reset();
+        gpio::deinit();
+        ledBar::deinit();
     }
 
     // demo application

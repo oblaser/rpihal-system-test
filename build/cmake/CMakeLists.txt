@@ -56,7 +56,9 @@ endif()
 include_directories(../../src/)
 
 set(SOURCES
+../../src/application/app.cpp
 ../../src/middleware/gpio.cpp
+../../src/middleware/led-bar.cpp
 ../../src/middleware/util.cpp
 ../../src/system-test/cli.cpp
 ../../src/system-test/context.cpp

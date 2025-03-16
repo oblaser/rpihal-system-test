@@ -48,7 +48,7 @@ int gpio::init()
     return r;
 }
 
-int gpio::reset()
+void gpio::deinit()
 {
     int r = 0;
 
@@ -59,8 +59,6 @@ int gpio::reset()
     if (RPIHAL_GPIO_resetPin(GPIO_LED1)) { r = -(__LINE__); }
 
     if (r) { LOG_ERR("RPIHAL_GPIO_resetPin() failed at line %i", -r); }
-
-    return r;
 }
 
 void gpio::task()

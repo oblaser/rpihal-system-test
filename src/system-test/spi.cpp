@@ -26,7 +26,6 @@ using std::printf;
 
 
 
-// added `dtoverlay=spi0-1cs` to top of "/boot/firmware/config.txt"
 static const char* const dev_spi = "/dev/spidev0.0";
 
 
@@ -59,7 +58,7 @@ system_test::Case Shift_Register()
     initStruct.mode = RPIHAL_GPIO_MODE_OUT;
     initStruct.pull = RPIHAL_GPIO_PULL_NONE;
 
-    RPIHAL_GPIO_writePin(GPIO_SR_LATCH, 0); // make sure that the pin stays low
+    RPIHAL_GPIO_writePin(GPIO_SR_LATCH, 0); // prevent positive transition
     err = RPIHAL_GPIO_initPin(GPIO_SR_LATCH, &initStruct);
     CTX_REQUIRE(tc, !err, "failed to init latch pin");
 

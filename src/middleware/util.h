@@ -30,7 +30,7 @@ std::string t_to_iso8601(time_t t);
 std::string t_to_iso8601_local(time_t t);
 std::string t_to_iso8601_time_local(time_t t);
 
-int sleep(unsigned t_ms);
+int sleep(uint32_t t_ms);
 
 } // namespace util
 

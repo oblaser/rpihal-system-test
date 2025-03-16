@@ -87,7 +87,7 @@ __pragma(message(__PRAGMA_LOC__ ": warning: \"CONFIG_LOG_LEVEL is not defined, d
 #define LOG_WRN(msg, ...) std::printf(___LOG_CSI_EL "[%s] " "\033[93m" ___LOG_STR(LOG_MODULE_NAME) " <WRN> " msg "\033[39m" "\n", util::t_to_iso8601_local(std::time(nullptr)).c_str() ___LOG_OPT_VA_ARGS(__VA_ARGS__))
 #define LOG_INF(msg, ...) std::printf(___LOG_CSI_EL "[%s] " "\033[39m" ___LOG_STR(LOG_MODULE_NAME) " <INF> " msg "\033[39m" "\n", util::t_to_iso8601_local(std::time(nullptr)).c_str() ___LOG_OPT_VA_ARGS(__VA_ARGS__))
 //#define LOG_DBG(msg, ...) std::printf(___LOG_CSI_EL "[%s] " "\033[39m" ___LOG_STR(LOG_MODULE_NAME) " <DBG> " msg "\033[39m" "\n", util::t_to_iso8601_local(std::time(nullptr)).c_str() ___LOG_OPT_VA_ARGS(__VA_ARGS__))
-#define LOG_DBG(msg, ...) std::printf(___LOG_CSI_EL "[%s] " "\033[39m" ___LOG_STR(LOG_MODULE_NAME) " <DBG> \033[90m" __func__ "():%i\033[39m " msg "\033[39m" "\n", util::t_to_iso8601_local(std::time(nullptr)).c_str(), (int)(__LINE__) ___LOG_OPT_VA_ARGS(__VA_ARGS__))
+#define LOG_DBG(msg, ...) std::printf(___LOG_CSI_EL "[%s] " "\033[39m" ___LOG_STR(LOG_MODULE_NAME) " <DBG> \033[90m%s():%i\033[39m " msg "\033[39m" "\n", util::t_to_iso8601_local(std::time(nullptr)).c_str(), __func__, (int)(__LINE__) ___LOG_OPT_VA_ARGS(__VA_ARGS__))
 // clang-format on
 
 

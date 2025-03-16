@@ -17,7 +17,7 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #ifdef OMW_PLAT_WIN
 #include <Windows.h>
 #else // OMW_PLAT_WIN
-#include <unistd.h>
+#include <time.h>
 #endif // OMW_PLAT_WIN
 
 
@@ -70,13 +70,20 @@ std::string util::t_to_iso8601_time_local(time_t t)
     return r;
 }
 
-int util::sleep(unsigned t_ms)
+int util::sleep(uint32_t t_ms)
 {
 #ifdef OMW_PLAT_WIN
+
     Sleep(t_ms);
     return 0;
-#else  // OMW_PLAT_WIN
-    return usleep(t_ms * 1000);
+
+#else // OMW_PLAT_WIN
+
+    struct timespec ts;
+    ts.tv_sec = (time_t)(t_ms / 1000);
+    ts.tv_nsec = (int32_t)((t_ms - ((uint32_t)(ts.tv_sec) * 1000)) * 1000000);
+    return nanosleep(&ts, NULL);
+
 #endif // OMW_PLAT_WIN
 }
 
