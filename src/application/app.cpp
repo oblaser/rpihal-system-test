@@ -11,6 +11,7 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include "middleware/adc.h"
 #include "middleware/gpio.h"
 #include "middleware/led-bar.h"
+#include "middleware/temperature.h"
 #include "project.h"
 
 #include <omw/clock.h>
@@ -101,10 +102,8 @@ void app::task()
     case S_update:
 
         potResult = adc::readPoti();
-
         RPIHAL_SYS_getCpuTemp(&tempCPU);
-
-        tempPCB = 3.7499f; // TODO
+        tempPCB = temp::get();
 
         setLedBar();
 

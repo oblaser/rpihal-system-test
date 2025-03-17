@@ -10,6 +10,7 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #include "middleware/adc.h"
 #include "middleware/gpio.h"
 #include "middleware/led-bar.h"
+#include "middleware/temperature.h"
 #include "middleware/util.h"
 #include "project.h"
 #include "system-test/cli.h"
@@ -161,10 +162,10 @@ int main(int argc, char** argv)
 
     if ((r == EC_OK) && (argFlags & ARG_FLAG_APP))
     {
-        if (adc::init()) { r = EC_ERROR; }
-        if (ledBar::init()) { r = EC_ERROR; }
-
+        if (adc::init()) { r = EC_RPIHAL_INIT_ERROR; }
         if (gpio::init()) { r = EC_RPIHAL_INIT_ERROR; }
+        if (ledBar::init()) { r = EC_RPIHAL_INIT_ERROR; }
+        if (temp::init()) { r = EC_RPIHAL_INIT_ERROR; }
 
 #if defined(PRJ_DEBUG) && 0
         RPIHAL_GPIO_dumpAltFuncReg(0x3c0000);
@@ -186,6 +187,7 @@ int main(int argc, char** argv)
         adc::deinit();
         gpio::deinit();
         ledBar::deinit();
+        temp::deinit();
     }
 
     // demo application

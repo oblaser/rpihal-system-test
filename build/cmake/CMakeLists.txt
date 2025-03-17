@@ -60,6 +60,7 @@ set(SOURCES
 ../../src/middleware/adc.cpp
 ../../src/middleware/gpio.cpp
 ../../src/middleware/led-bar.cpp
+../../src/middleware/temperature.cpp
 ../../src/middleware/util.cpp
 ../../src/system-test/cli.cpp
 ../../src/system-test/context.cpp
