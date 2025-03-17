@@ -20,6 +20,10 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include "middleware/log.h"
 
 
+#define LATCH_AS_nCS   (1) // driving the latch pin like a nCS signal, helps logic analyzers
+#define MAX_CLOCK_FREQ (411000)
+
+
 
 static RPIHAL_SPI_instance_t ___spi;
 static RPIHAL_SPI_instance_t* const spi = &___spi;
@@ -48,7 +52,7 @@ int ledBar::init()
         return -(__LINE__);
     }
 
-    err = RPIHAL_SPI_open(spi, "/dev/spidev0.0", 411000, RPIHAL_SPI_MODE_0, RPIHAL_SPI_CFG_FLAG_NO_CS);
+    err = RPIHAL_SPI_open(spi, "/dev/spidev0.0", MAX_CLOCK_FREQ, RPIHAL_SPI_CFG_MODE_0 | RPIHAL_SPI_CFG_NO_CS);
     if (err)
     {
         LOG_ERR("failed to open SPI, err: %i, errno: %i %s", err, errno, std::strerror(errno));
@@ -82,16 +86,23 @@ void ledBar::setValue(uint8_t value)
 {
     uint8_t rxDummy[1];
 
+#if LATCH_AS_nCS
+    RPIHAL_GPIO_writePin(GPIO_SR_LATCH, 0);
+#endif // LATCH_AS_nCS
+
     const int err = RPIHAL_SPI_transfer(spi, &value, rxDummy, 1);
 
     if (err) { LOG_ERR("failed to set value, err: %i, errno: %i %s", err, errno, std::strerror(errno)); }
+#if !LATCH_AS_nCS
     else
     {
+        // t_i >= 400ns
         RPIHAL_GPIO_writePin(GPIO_SR_LATCH, 1);
-
         volatile int i = 0;
         while (i < 1) { ++i; }
-
         RPIHAL_GPIO_writePin(GPIO_SR_LATCH, 0);
     }
+#else  // LATCH_AS_nCS
+    RPIHAL_GPIO_writePin(GPIO_SR_LATCH, 1);
+#endif // LATCH_AS_nCS
 }

@@ -67,7 +67,7 @@ system_test::Case Shift_Register()
     RPIHAL_SPI_instance_t ___spi;
     RPIHAL_SPI_instance_t* const spi = &___spi;
 
-    err = RPIHAL_SPI_open(spi, dev_spi, 199000, RPIHAL_SPI_MODE_0, RPIHAL_SPI_CFG_FLAG_NO_CS);
+    err = RPIHAL_SPI_open(spi, dev_spi, 199000, RPIHAL_SPI_CFG_MODE_0 | RPIHAL_SPI_CFG_NO_CS);
     CTX_REQUIRE(tc, !err, "failed to open SPI device " + std::string(dev_spi) + " - " + strerror(errno));
 
 
@@ -127,7 +127,7 @@ system_test::Case Read_ADC()
     RPIHAL_SPI_instance_t ___spi;
     RPIHAL_SPI_instance_t* const spi = &___spi;
 
-    err = RPIHAL_SPI_open(spi, dev_spi, 412000, RPIHAL_SPI_MODE_3, RPIHAL_SPI_CFG_FLAG_DEFAULT);
+    err = RPIHAL_SPI_open(spi, dev_spi, 412000, RPIHAL_SPI_CFG_MODE_3);
     CTX_REQUIRE(tc, !err, "failed to open SPI device " + std::string(dev_spi) + " - " + strerror(errno));
 
     std::string instr;
@@ -154,7 +154,7 @@ system_test::Case Read_ADC()
     CTX_CHECK(tc, ((rxBuffer[1] & 0x04) == 0), "result null bit is not null");
     result = getResult();
     value = (float)result * 100.0f / 1023.0f;
-    printf(CLI_SGR_BBLACK "%5.1f%% 0x%03x %i" CLI_SGR_FG_DEFAULT "\n", value, (int)result, (int)result);
+    printf("%5.1f%% 0x%03x %i\n", value, (int)result, (int)result);
     CTX_CHECK(tc, ((value >= (target - tolerance)) && (value <= (target + tolerance))), instr);
 
 
@@ -169,7 +169,7 @@ system_test::Case Read_ADC()
     CTX_CHECK(tc, ((rxBuffer[1] & 0x04) == 0), "result null bit is not null");
     result = getResult();
     value = (float)result * 100.0f / 1023.0f;
-    printf(CLI_SGR_BBLACK "%5.1f%% 0x%03x %i" CLI_SGR_FG_DEFAULT "\n", value, (int)result, (int)result);
+    printf("%5.1f%% 0x%03x %i\n", value, (int)result, (int)result);
     CTX_CHECK(tc, ((value >= 0.0f) && (value <= (target + tolerance))), instr);
 
 
@@ -184,7 +184,7 @@ system_test::Case Read_ADC()
     CTX_CHECK(tc, ((rxBuffer[1] & 0x04) == 0), "result null bit is not null");
     result = getResult();
     value = (float)result * 100.0f / 1023.0f;
-    printf(CLI_SGR_BBLACK "%5.1f%% 0x%03x %i" CLI_SGR_FG_DEFAULT "\n", value, (int)result, (int)result);
+    printf("%5.1f%% 0x%03x %i\n", value, (int)result, (int)result);
     CTX_CHECK(tc, ((value >= (target - tolerance)) && (value <= 100.0f)), instr);
 
 

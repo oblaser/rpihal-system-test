@@ -242,9 +242,6 @@ void assertGpioRead(system_test::Case& tc, uint64_t mask, uint64_t expectedValue
     const uint32_t valueHi = RPIHAL_GPIO_readHi();
     const uint64_t value = RPIHAL_GPIO_read64();
 
-    printf("32 %08x%08x\n", valueHi, valueLo);
-    printf("64 %016llx\n", value);
-
     const uint32_t maskLo = (uint32_t)(mask);
     const uint32_t maskHi = (uint32_t)(mask >> 32);
 
