@@ -31,23 +31,25 @@ enum
     S_init = 0,
     S_idle,
     S_update,
+    S_exit,
 };
 
 enum
 {
-    M_poti = 0,
+    M_potBar = 0,
+    M_potValue,
     M_btn1,
     M_temp,
-    M_3,
 
     M__end_,
 };
 
 
 
+static bool exitSignal = false;
 static int state = S_init;
 static int mode;
-static float potPos; // normal [0, 1]
+static adc::Result potResult;
 static uint8_t btn1Cnt;
 static float tempCPU, tempPCB; // degC
 static bool showTemp_PCB_nCPU;
@@ -55,7 +57,7 @@ static timepoint_t tpUpdate;
 
 
 
-static void handleButtons();
+static void handleButtons(const timepoint_t& tpNow);
 static void setLedBar();
 static std::string modeString(int mode);
 
@@ -66,7 +68,7 @@ void app::task()
     const timepoint_t tpNow = omw::clock::now();
 
 
-    handleButtons();
+    handleButtons(tpNow);
 
     switch (state)
     {
@@ -76,7 +78,7 @@ void app::task()
         gpio::led0->clr();
         gpio::led1->clr();
 
-        potPos = 0;
+        potResult = 0;
         btn1Cnt = 0;
         tempCPU = 0;
         tempPCB = 0;
@@ -98,7 +100,7 @@ void app::task()
 
     case S_update:
 
-        potPos = adc::readPoti().norm();
+        potResult = adc::readPoti();
 
         RPIHAL_SYS_getCpuTemp(&tempCPU);
 
@@ -106,6 +108,11 @@ void app::task()
 
         setLedBar();
 
+        break;
+
+    case S_exit:
+        ledBar::setValue(0);
+        exitSignal = true;
         break;
 
     default:
@@ -118,12 +125,24 @@ void app::task()
     }
 }
 
+bool app::exit() { return exitSignal; }
 
 
-void handleButtons()
+
+void handleButtons(const timepoint_t& tpNow)
 {
-    if (gpio::btn0->pos()) { LOG_DBG("BTN0 pos"); }
+    static timepoint_t tpBtn0;
 
+    if (!gpio::btn0->state()) { tpBtn0 = tpNow; }
+    if (elapsed_ms(tpNow, tpBtn0, 1000))
+    {
+        LOG_INF("BTN0 long press");
+        state = S_exit;
+    }
+
+
+
+    if (gpio::btn0->pos()) { LOG_DBG("BTN0 pos"); }
     if (gpio::btn0->neg())
     {
         LOG_DBG("BTN0 neg");
@@ -140,13 +159,20 @@ void handleButtons()
         LOG_INF("mode: %i %s", mode, modeString(mode).c_str());
     }
 
-    if (gpio::btn1->pos()) { LOG_DBG("BTN1 pos"); }
 
+
+    if (gpio::btn1->pos()) { LOG_DBG("BTN1 pos"); }
     if (gpio::btn1->neg())
     {
         LOG_DBG("BTN1 neg");
 
-        if (mode == M_btn1) { ++btn1Cnt; }
+        if (mode == M_btn1)
+        {
+            if (potResult.norm() >= 0.75f) { btn1Cnt += 0x10; }
+            else if (potResult.norm() >= 0.5f) { ++btn1Cnt; }
+            else if (potResult.norm() >= 0.25f) { --btn1Cnt; }
+            else { btn1Cnt -= 0x10; }
+        }
         else if (mode == M_temp) { showTemp_PCB_nCPU = !showTemp_PCB_nCPU; }
     }
 }
@@ -155,8 +181,12 @@ void setLedBar()
 {
     switch (mode)
     {
-    case M_poti:
-        ledBar::setBar((int)(potPos * 8.0f + 0.5f));
+    case M_potBar:
+        ledBar::setBar((int)(potResult.norm() * 8.0f + 0.5f));
+        break;
+
+    case M_potValue:
+        ledBar::setValue((uint8_t)(potResult.value() >> 2));
         break;
 
     case M_btn1:
@@ -179,10 +209,6 @@ void setLedBar()
     }
     break;
 
-    case M_3:
-        ledBar::setValue(0xDB);
-        break;
-
     default:
         LOG_ERR("invalid mode %i", mode);
         break;
@@ -195,8 +221,12 @@ std::string modeString(int mode)
 
     switch (mode)
     {
-    case M_poti:
+    case M_potBar:
         str = "potentiometer => LED bar";
+        break;
+
+    case M_potValue:
+        str = "potentiometer => LED bar (as binary value)";
         break;
 
     case M_btn1:
@@ -204,10 +234,9 @@ std::string modeString(int mode)
         break;
 
     case M_temp:
-        str = "PCB/CPU temp => LED bar";
+        str = "PCB/CPU temp => LED bar (fixed point 7.1)";
         break;
 
-    case M_3:
     default:
         str = "#" + std::to_string(mode);
         break;

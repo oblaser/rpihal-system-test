@@ -60,8 +60,6 @@ public:
         m_old = m_state;
     }
 
-    operator bool() const { return m_state; }
-
 private:
     bool m_state, m_old, m_pos, m_neg;
 };

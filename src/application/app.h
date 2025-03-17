@@ -14,6 +14,8 @@ namespace app {
 
 void task();
 
+bool exit();
+
 }
 
 

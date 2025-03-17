@@ -15,7 +15,9 @@ namespace adc {
 class Result
 {
 public:
-    Result() = delete;
+    Result()
+        : m_value(0), m_norm(0)
+    {}
 
     Result(uint16_t value)
         : m_value(value), m_norm((float)value / 1023.0f)

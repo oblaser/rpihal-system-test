@@ -171,10 +171,10 @@ int main(int argc, char** argv)
         RPIHAL_GPIO_dumpPullUpDnReg(0x3c0000);
 #endif
 
-        while ((r == EC_OK)
-#ifdef RPIHAL_EMU                        //
+        while ((r == EC_OK) && !app::exit()
+#ifdef RPIHAL_EMU
                && RPIHAL_EMU_isRunning() // this is optional, but may be convenient when EMU is used a lot
-#endif                                   //
+#endif
         )
         {
             gpio::task();

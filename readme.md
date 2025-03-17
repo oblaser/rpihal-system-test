@@ -33,6 +33,11 @@ If the binary is run without any options, only the detected model is printed, no
 | `app`  | run the demo application after the tests have succeeded |
 
 
+## Demo Application
+
+Button 0 cycles through the modes. Press and hold button 0 to exit the application. Button 1 has different functions depending on the active mode. Button 1 has no long press function.
+
+
 ## Hardware
 
 The test hardware is a custom board. [Schematic](https://static.oblaser.ch/rpihal/rpihal-test-board-rev00_SCM.pdf)
