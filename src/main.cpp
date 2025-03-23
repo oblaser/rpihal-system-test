@@ -168,8 +168,9 @@ int main(int argc, char** argv)
         if (temp::init()) { r = EC_RPIHAL_INIT_ERROR; }
 
 #if defined(PRJ_DEBUG) && 0
-        RPIHAL_GPIO_dumpAltFuncReg(0x3c0000);
-        RPIHAL_GPIO_dumpPullUpDnReg(0x3c0000);
+        constexpr uint64_t dumpPins = RPIHAL_GPIO_BIT(12) | RPIHAL_GPIO_BIT(13) | RPIHAL_GPIO_BIT(14) | RPIHAL_GPIO_BIT(15);
+        RPIHAL_GPIO_dumpAltFuncReg(dumpPins);
+        RPIHAL_GPIO_dumpPullUpDnReg(dumpPins);
 #endif
 
         while ((r == EC_OK) && !app::exit()
