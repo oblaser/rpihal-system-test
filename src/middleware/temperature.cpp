@@ -54,7 +54,7 @@ int temp::init()
     nBytes = RPIHAL_I2C_read(i2c, buffer, 2);
     if (nBytes != 2)
     {
-        LOG_ERR("failed to read device ID, err: %i, errno: %i %s", nBytes, errno, std::strerror(errno));
+        LOG_ERR("failed to read device ID, err: %lli, errno: %i %s", (long long)nBytes, errno, std::strerror(errno));
         return -(__LINE__);
     }
 
@@ -75,7 +75,7 @@ int temp::init()
     nBytes = RPIHAL_I2C_write(i2c, buffer, 2);
     if (nBytes != 2)
     {
-        LOG_ERR("failed to write config register, err: %i, errno: %i %s", nBytes, errno, std::strerror(errno));
+        LOG_ERR("failed to write config register, err: %lli, errno: %i %s", (long long)nBytes, errno, std::strerror(errno));
         return -(__LINE__);
     }
 
@@ -101,7 +101,7 @@ float temp::get()
     nBytes = RPIHAL_I2C_read(i2c, buffer, 2);
     if (nBytes != 2)
     {
-        LOG_ERR("failed to read temperature, err: %i, errno: %i %s", nBytes, errno, std::strerror(errno));
+        LOG_ERR("failed to read temperature, err: %lli, errno: %i %s", (long long)nBytes, errno, std::strerror(errno));
         return -9999;
     }
 
@@ -119,7 +119,7 @@ int setPointerRegister(uint8_t regAddr)
 
     if (res != 1)
     {
-        LOG_ERR("failed to set pointer register to 0x%02x, err: %i, errno: %i %s", (int)regAddr, res, errno, std::strerror(errno));
+        LOG_ERR("failed to set pointer register to 0x%02x, err: %lli, errno: %i %s", (int)regAddr, (long long)res, errno, std::strerror(errno));
         return -(__LINE__);
     }
 
