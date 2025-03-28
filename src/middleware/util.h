@@ -59,4 +59,16 @@ namespace cli {
 
 
 
+#if defined(_MSC_VER)
+#if (_MSVC_LANG >= 201703L)
+#define UTIL_UNUSED [[maybe_unused]]
+#else // Cpp std version
+#define UTIL_UNUSED
+#endif // Cpp std version
+#else  // compiler
+#define UTIL_UNUSED __attribute__((unused))
+#endif // compiler
+
+
+
 #endif // IG_MIDDLEWARE_UTIL_H

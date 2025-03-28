@@ -71,12 +71,12 @@ int main(int argc, char** argv)
 {
 #if PRJ_DEBUG && 1
     {
-        static char __attribute__((unused)) arg_test[] = "test";
-        static char __attribute__((unused)) arg_gpio[] = "gpio";
-        static char __attribute__((unused)) arg_spi[] = "spi";
-        static char __attribute__((unused)) arg_i2c[] = "i2c";
-        static char __attribute__((unused)) arg_all[] = "all";
-        static char __attribute__((unused)) arg_app[] = "app";
+        static char UTIL_UNUSED arg_test[] = "test";
+        static char UTIL_UNUSED arg_gpio[] = "gpio";
+        static char UTIL_UNUSED arg_spi[] = "spi";
+        static char UTIL_UNUSED arg_i2c[] = "i2c";
+        static char UTIL_UNUSED arg_all[] = "all";
+        static char UTIL_UNUSED arg_app[] = "app";
 
         // clang-format off
         static char* ___dbg_argv[] = {

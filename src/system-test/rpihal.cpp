@@ -130,7 +130,12 @@ std::string system_test::util::model_to_string(uint64_t model)
         break;
 
     default:
-        printf("\033[91mERR\033[39m model 0x%08llx is unknown to the system-test application (%s:%i)\n", (long long)model, __PRETTY_FUNCTION__,
+        printf("\033[91mERR\033[39m model 0x%08llx is unknown to the system-test application (%s:%i)\n", (long long)model,
+#ifdef _MSC_VER
+               __FUNCSIG__,
+#else
+               __PRETTY_FUNCTION__,
+#endif
                (int)(__LINE__));
         str = "ERROR";
         break;

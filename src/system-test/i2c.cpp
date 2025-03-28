@@ -3,11 +3,14 @@ author          Oliver Blaser
 copyright       MIT - Copyright (c) 2025 Oliver Blaser
 */
 
+#include <cerrno>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <string>
 
 #include "i2c.h"
+#include "middleware/util.h"
 #include "project.h"
 #include "system-test/cli.h"
 #include "system-test/context.h"
@@ -16,11 +19,8 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include <omw/string.h>
 #include <rpihal/i2c.h>
 
-#include <errno.h>
-#include <string.h>
-#include <time.h>
 
-
+using std::strerror;
 using namespace system_test;
 
 
@@ -82,11 +82,7 @@ system_test::Case Read_Temp()
     nBytes = RPIHAL_I2C_write(i2c, buffer, 2);
     CTX_CHECK(tc, (nBytes == 2), "failed to write config register" + std::string(" - ") + strerror(errno));
 
-    const struct timespec tsDelay = {
-        .tv_sec = 0,
-        .tv_nsec = (15 * 1000 * 1000), // conversion time is max 15ms
-    };
-    err = nanosleep(&tsDelay, NULL);
+    util::sleep(15); // conversion time is max 15ms
     if (err) { cli::printWarning(tc, "failed to delay for conversion time" + std::string(" - ") + strerror(errno)); }
 
 
