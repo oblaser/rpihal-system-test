@@ -144,7 +144,7 @@ extern "C" int ledbar_spi_emu_transfer_callback(const uint8_t* txData, uint8_t* 
 #else
         const char* const lc = "\xE2\x88\x8E"; // LED char
         const char* const sgrOn = "\033[38:5:208m";
-        const char* const sgrOff = "\033[38:5:235m";
+        const char* const sgrOff = "\033[38:5:237m";
 #endif
 
         const char* const sgr_b0 = (value & 0x01 ? sgrOn : sgrOff);

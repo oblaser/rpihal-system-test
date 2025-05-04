@@ -110,7 +110,11 @@ void app::task()
 
         setLedBar();
 
+#ifdef RPIHAL_EMU
+        state = S_idle;
+#else
         // state = S_idle;
+#endif
 
         break;
 
