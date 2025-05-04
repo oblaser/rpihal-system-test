@@ -75,8 +75,30 @@ set(SOURCES
 
 
 add_executable(${BINNAME} ${SOURCES})
+
 target_link_libraries(${BINNAME} omw rpihal)
-target_compile_options(${BINNAME} PRIVATE -Wno-psabi -Wall -Werror=return-type -Werror=switch -Werror=reorder -Werror=format)
+
+target_compile_options(${BINNAME} PRIVATE
+    -Wall
+    -Werror=format
+    -Werror=overflow
+    -Werror=return-type
+    -Wdouble-promotion
+
+    $<$<COMPILE_LANGUAGE:C>:
+        -Werror=discarded-qualifiers
+        -Werror=implicit
+        -Werror=incompatible-pointer-types
+        -Werror=int-conversion
+        -Werror=pointer-sign
+    >
+
+    $<$<COMPILE_LANGUAGE:CXX>:
+        -Werror=reorder
+        -Werror=switch
+        -Wno-psabi
+    >
+)
 
 
 

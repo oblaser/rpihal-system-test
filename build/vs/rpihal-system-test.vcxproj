@@ -131,7 +131,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\sdk\rpihal\src\emu\emu.cpp" />
-    <ClCompile Include="..\..\sdk\rpihal\src\internal\gpio.c" />
     <ClCompile Include="..\..\src\application\app.cpp" />
     <ClCompile Include="..\..\src\main.cpp" />
     <ClCompile Include="..\..\src\middleware\adc.cpp" />
@@ -148,7 +147,6 @@
     <ClCompile Include="..\..\src\system-test\sys.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\sdk\rpihal\src\emu\emu.h" />
     <ClInclude Include="..\..\src\application\app.h" />
     <ClInclude Include="..\..\src\middleware\adc.h" />
     <ClInclude Include="..\..\src\middleware\gpio.h" />

@@ -154,7 +154,7 @@ system_test::Case Read_ADC()
     CTX_CHECK(tc, ((rxBuffer[1] & 0x04) == 0), "result null bit is not null");
     result = getResult();
     value = (float)result * 100.0f / 1023.0f;
-    printf("%5.1f%% 0x%03x %i\n", value, (int)result, (int)result);
+    printf("%5.1f%% 0x%03x %i\n", (double)value, (int)result, (int)result);
     CTX_CHECK(tc, ((value >= (target - tolerance)) && (value <= (target + tolerance))), instr);
 
 
@@ -169,7 +169,7 @@ system_test::Case Read_ADC()
     CTX_CHECK(tc, ((rxBuffer[1] & 0x04) == 0), "result null bit is not null");
     result = getResult();
     value = (float)result * 100.0f / 1023.0f;
-    printf("%5.1f%% 0x%03x %i\n", value, (int)result, (int)result);
+    printf("%5.1f%% 0x%03x %i\n", (double)value, (int)result, (int)result);
     CTX_CHECK(tc, ((value >= 0.0f) && (value <= (target + tolerance))), instr);
 
 
@@ -184,7 +184,7 @@ system_test::Case Read_ADC()
     CTX_CHECK(tc, ((rxBuffer[1] & 0x04) == 0), "result null bit is not null");
     result = getResult();
     value = (float)result * 100.0f / 1023.0f;
-    printf("%5.1f%% 0x%03x %i\n", value, (int)result, (int)result);
+    printf("%5.1f%% 0x%03x %i\n", (double)value, (int)result, (int)result);
     CTX_CHECK(tc, ((value >= (target - tolerance)) && (value <= 100.0f)), instr);
 
 

@@ -24,6 +24,8 @@ copyright       MIT - Copyright (c) 2024 Oliver Blaser
 #include <omw/cli.h>
 #include <omw/defs.h>
 #include <omw/windows/windows.h>
+
+#include <rpihal/emu/emu.h>
 #include <rpihal/rpihal.h>
 
 

@@ -17,6 +17,7 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 
 #include <omw/encoding.h>
 #include <omw/string.h>
+
 #include <rpihal/i2c.h>
 
 

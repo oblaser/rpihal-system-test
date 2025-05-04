@@ -15,6 +15,7 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include "project.h"
 
 #include <omw/clock.h>
+
 #include <rpihal/sys.h>
 
 
@@ -60,6 +61,8 @@ static timepoint_t tpUpdate;
 
 static void handleButtons(const timepoint_t& tpNow);
 static void setLedBar();
+static void printStatusBar(int value, const char* unitStr);
+static void printStatusBar(float value, const char* unitStr);
 static std::string modeString(int mode);
 
 
@@ -106,6 +109,8 @@ void app::task()
         tempPCB = temp::get();
 
         setLedBar();
+
+        // state = S_idle;
 
         break;
 
@@ -182,14 +187,17 @@ void setLedBar()
     {
     case M_potBar:
         ledBar::setBar((int)(potResult.norm() * 8.0f + 0.5f));
+        printStatusBar(potResult.norm() * 100.0f, "%");
         break;
 
     case M_potValue:
         ledBar::setValue((uint8_t)(potResult.value() >> 2));
+        printStatusBar(potResult.norm() * 100.0f, "%");
         break;
 
     case M_btn1:
         ledBar::setValue(btn1Cnt);
+        printStatusBar(btn1Cnt, "");
         break;
 
     case M_temp:
@@ -201,10 +209,11 @@ void setLedBar()
         if ((temp < 0) || (temp >= 127.75f)) { ledBar::setValue(0xFF); }
         else
         {
-            temp += 0.25f;                        // round to 0.5
-            const int fixed = (int)(temp * 2.0f); // make unsigned fixed point 7.1
+            const int fixed = (int)((temp + /* round to 0.5 */ 0.25f) * 2.0f); // make unsigned fixed point 7.1
             ledBar::setValue((uint8_t)fixed);
         }
+
+        printStatusBar(temp, OMW_UTF8CP_deg "C");
     }
     break;
 
@@ -212,6 +221,24 @@ void setLedBar()
         LOG_ERR("invalid mode %i", mode);
         break;
     }
+}
+
+void printStatusBar(int value, const char* unitStr)
+{
+    const char* const format = "\033[2C" // cursor forward
+                               "%i%s   " // value
+                               "\r";     // cursor return
+
+    printf(format, value, unitStr);
+}
+
+void printStatusBar(float value, const char* unitStr)
+{
+    const char* const format = "\033[2C"   // cursor forward
+                               "%.2f%s   " // value
+                               "\r";       // cursor return
+
+    printf(format, (double)value, unitStr);
 }
 
 std::string modeString(int mode)

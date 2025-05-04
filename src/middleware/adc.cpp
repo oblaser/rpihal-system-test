@@ -30,6 +30,12 @@ static RPIHAL_SPI_instance_t* const spi = &___spi;
 
 
 
+#ifdef RPIHAL_EMU
+extern "C" int adc_spi_emu_transfer_callback(const uint8_t* txData, uint8_t* rxBuffer, size_t count);
+#endif
+
+
+
 int adc::init()
 {
     int err;
@@ -58,6 +64,10 @@ int adc::init()
         LOG_ERR("failed to open SPI, err: %i, errno: %i %s", err, errno, std::strerror(errno));
         return -(__LINE__);
     }
+
+#ifdef RPIHAL_EMU
+    spi->transfer_cb = adc_spi_emu_transfer_callback;
+#endif
 
     return 0;
 }
@@ -107,3 +117,49 @@ adc::Result adc::read(uint8_t channel)
 
     return r;
 }
+
+
+
+#ifdef RPIHAL_EMU
+extern "C" int adc_spi_emu_transfer_callback(const uint8_t* txData, uint8_t* rxBuffer, size_t count)
+{
+    int r = -1;
+
+    if (count == 3)
+    {
+        // MCP3004 emulator
+
+        if (txData[0] == 0x01)
+        {
+            const bool single = ((txData[1] & 0x80) != 0);
+
+            const uint8_t ch = ((txData[1] >> 4) & 0x07) & /* MCP3004 ch mask */ 0x03;
+
+            uint16_t adcResult_10bit;
+
+            if (single)
+            {
+                if (ch == 0) { adcResult_10bit = 600; }
+                else { adcResult_10bit = 0; }
+            }
+            else
+            {
+                adcResult_10bit = 0;
+                LOG_ERR("%s differential input mode is not implemented", __func__);
+            }
+
+            // rxBuffer[0] = don't care
+            rxBuffer[1] = (uint8_t)(adcResult_10bit >> 8);
+            rxBuffer[2] = (uint8_t)adcResult_10bit;
+
+            rxBuffer[1] &= ~0x04; // null bit
+
+            r = 0;
+        }
+        else { LOG_ERR("%s invalid start byte: %02x", __func__, (int)(txData[0])); }
+    }
+    else { LOG_ERR("%s count: %zu", __func__, count); }
+
+    return r;
+}
+#endif // RPIHAL_EMU

@@ -30,6 +30,12 @@ static RPIHAL_SPI_instance_t* const spi = &___spi;
 
 
 
+#ifdef RPIHAL_EMU
+extern "C" int ledbar_spi_emu_transfer_callback(const uint8_t* txData, uint8_t* rxBuffer, size_t count);
+#endif
+
+
+
 int ledBar::init()
 {
     int err;
@@ -58,6 +64,10 @@ int ledBar::init()
         LOG_ERR("failed to open SPI, err: %i, errno: %i %s", err, errno, std::strerror(errno));
         return -(__LINE__);
     }
+
+#ifdef RPIHAL_EMU
+    spi->transfer_cb = ledbar_spi_emu_transfer_callback;
+#endif
 
     return 0;
 }
@@ -106,3 +116,52 @@ void ledBar::setValue(uint8_t value)
     RPIHAL_GPIO_writePin(GPIO_SR_LATCH, 1);
 #endif // LATCH_AS_nCS
 }
+
+
+
+#ifdef RPIHAL_EMU
+#include <stdio.h>
+extern "C" int ledbar_spi_emu_transfer_callback(const uint8_t* txData, uint8_t* rxBuffer, size_t count)
+{
+    int r = -1;
+
+    if (count == 1)
+    {
+        const int value = txData[0];
+
+        const char* const format = "\033[20C"                         // cursor forward
+                                   "0x%02x "                          // value
+                                   "%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s%s" // bits SGR
+                                   "\033[49;39m"                      // SGR reset BG and FG
+                                   "\r";                              // cursor return
+
+
+
+#ifdef _WIN32
+        const char* const lc = "\xE2\x96\xA0"; // LED char
+        const char* const sgrOn = "\033[93m";
+        const char* const sgrOff = "\033[90m";
+#else
+        const char* const lc = "\xE2\x88\x8E"; // LED char
+        const char* const sgrOn = "\033[38:5:208m";
+        const char* const sgrOff = "\033[38:5:235m";
+#endif
+
+        const char* const sgr_b0 = (value & 0x01 ? sgrOn : sgrOff);
+        const char* const sgr_b1 = (value & 0x02 ? sgrOn : sgrOff);
+        const char* const sgr_b2 = (value & 0x04 ? sgrOn : sgrOff);
+        const char* const sgr_b3 = (value & 0x08 ? sgrOn : sgrOff);
+        const char* const sgr_b4 = (value & 0x10 ? sgrOn : sgrOff);
+        const char* const sgr_b5 = (value & 0x20 ? sgrOn : sgrOff);
+        const char* const sgr_b6 = (value & 0x40 ? sgrOn : sgrOff);
+        const char* const sgr_b7 = (value & 0x80 ? sgrOn : sgrOff);
+
+        printf(format, value, sgr_b7, lc, sgr_b6, lc, sgr_b5, lc, sgr_b4, lc, sgr_b3, lc, sgr_b2, lc, sgr_b1, lc, sgr_b0, lc);
+
+        r = 0;
+    }
+    else { LOG_ERR("%s count: %zu", __func__, count); }
+
+    return r;
+}
+#endif // RPIHAL_EMU

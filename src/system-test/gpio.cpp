@@ -14,6 +14,7 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include "system-test/context.h"
 
 #include <omw/string.h>
+
 #include <rpihal/gpio.h>
 
 
