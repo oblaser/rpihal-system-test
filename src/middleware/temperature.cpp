@@ -23,6 +23,11 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include "middleware/log.h"
 
 
+#ifdef _MSC_VER // clang-format off
+#pragma warning(disable: 4996)
+#endif // clang-format on
+
+
 
 static RPIHAL_I2C_instance_t ___i2c;
 static RPIHAL_I2C_instance_t* const i2c = &___i2c;

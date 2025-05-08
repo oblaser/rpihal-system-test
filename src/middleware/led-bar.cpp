@@ -20,6 +20,11 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include "middleware/log.h"
 
 
+#ifdef _MSC_VER // clang-format off
+#pragma warning(disable: 4996)
+#endif // clang-format on
+
+
 #define LATCH_AS_nCS   (1) // driving the latch pin like a nCS signal, helps logic analyzers
 #define MAX_CLOCK_FREQ (411000)
 

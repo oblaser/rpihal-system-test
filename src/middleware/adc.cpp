@@ -19,6 +19,11 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include "middleware/log.h"
 
 
+#ifdef _MSC_VER // clang-format off
+#pragma warning(disable: 4996)
+#endif // clang-format on
+
+
 #define MAX_CLOCK_FREQ (811000)
 
 #define PIN_nCS (8)

@@ -21,6 +21,11 @@ copyright       MIT - Copyright (c) 2025 Oliver Blaser
 #include <rpihal/i2c.h>
 
 
+#ifdef _MSC_VER // clang-format off
+#pragma warning(disable: 4996)
+#endif // clang-format on
+
+
 using std::strerror;
 using namespace system_test;
 
